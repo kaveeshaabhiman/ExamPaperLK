@@ -54,52 +54,226 @@
             border-color: #6366f1;
             box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
         }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) scale(1.1);
+            }
+
+            50% {
+                transform: translateY(-10px) scale(1.15);
+            }
+
+            100% {
+                transform: translateY(0) scale(1.1);
+            }
+        }
+
+        .animate-float {
+            animation: float 15s ease-in-out infinite;
+        }
+
+        @keyframes slide-up {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-slide-up {
+            animation: slide-up 1s ease-out forwards;
+            animation-delay: 0.5s;
+            opacity: 0;
+        }
+
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fade-in 0.3s ease-out forwards;
+        }
     </style>
 </head>
 
-<body class="min-h-screen flex items-center justify-center p-6">
-    <!-- Animated Background -->
-    <div class="orb bg-indigo-600 top-[-10%] left-[-10%]"></div>
-    <div class="orb bg-purple-600 bottom-[-10%] right-[-10%]" style="animation-delay: -5s;"></div>
+<body class="min-h-screen flex items-center justify-center bg-[#050810] overflow-hidden">
+    <!-- Split Screen Container -->
+    <div class="flex w-full min-h-screen">
 
-    <div class="w-full max-w-[450px] relative z-10 transition-all duration-700 opacity-0 transform translate-y-10"
-        id="loginCard">
-        <div class="glass p-10 md:p-14 rounded-[3.5rem] text-center">
-            <!-- Logo Section -->
-            <div
-                class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center text-white mx-auto mb-10 shadow-2xl shadow-indigo-500/20 rotate-3 transform hover:rotate-0 transition-all">
-                <span class="text-4xl font-black">E</span>
+        <!-- Left Side: Visual Immersive Area (Hidden on mobile) -->
+        <div class="hidden lg:flex w-1/2 relative overflow-hidden items-center justify-center p-20">
+            <!-- Background Image -->
+            <div class="absolute inset-0 z-0">
+                <img src="https://images.unsplash.com/photo-1523240715181-2f0bd9a269cc?auto=format&fit=crop&q=80&w=2070"
+                    class="w-full h-full object-cover opacity-60 scale-110 animate-float"
+                    style="filter: brightness(0.6) contrast(1.2);">
+                <!-- Animated Overlays -->
+                <div class="absolute inset-0 bg-gradient-to-tr from-indigo-900/80 via-transparent to-purple-900/40">
+                </div>
+                <div class="absolute inset-0 backdrop-blur-[2px]"></div>
             </div>
 
-            <div id="authContent">
-                <h1 class="text-4xl font-black text-white mb-3 tracking-tighter">Welcome Back</h1>
-                <p class="text-slate-400 font-medium mb-10">Sign in to access premium archives</p>
+            <div class="relative z-10 max-w-lg animate-slide-up">
+                <div class="w-20 h-2 bg-indigo-500 rounded-full mb-10"></div>
+                <h2 class="text-7xl font-black text-white tracking-tighter leading-none mb-8">Master Your <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Future.</span>
+                </h2>
+                <p class="text-xl text-slate-300 font-medium leading-relaxed mb-12">Access the largest archive of
+                    premium exam papers across Sri Lanka. Your journey to excellence starts here.</p>
 
-                <form onsubmit="handleAuth(event)" class="space-y-4">
-                    <div id="registerFields" class="hidden space-y-4">
-                        <input type="text" id="name" placeholder="Full Name"
-                            class="w-full px-8 py-5 rounded-2xl input-glass outline-none font-medium">
+                <div class="flex items-center gap-6">
+                    <div class="flex -space-x-4">
+                        <img src="https://i.pravatar.cc/100?u=1"
+                            class="w-12 h-12 rounded-full border-2 border-indigo-900">
+                        <img src="https://i.pravatar.cc/100?u=2"
+                            class="w-12 h-12 rounded-full border-2 border-indigo-900">
+                        <img src="https://i.pravatar.cc/100?u=3"
+                            class="w-12 h-12 rounded-full border-2 border-indigo-900">
+                        <div
+                            class="w-12 h-12 rounded-full bg-indigo-600 border-2 border-indigo-900 flex items-center justify-center text-[10px] font-black text-white">
+                            +10k</div>
                     </div>
-                    <input type="email" id="email" required placeholder="Gmail Address"
-                        class="w-full px-8 py-5 rounded-2xl input-glass outline-none font-medium">
-                    <input type="password" id="password" required placeholder="••••••••"
-                        class="w-full px-8 py-5 rounded-2xl input-glass outline-none font-medium tracking-widest text-center">
-
-                    <button type="submit" id="submitBtn"
-                        class="w-full py-5 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-500 transition-all shadow-xl active:scale-95 mt-4 uppercase tracking-widest text-xs">
-                        Unlock Library
-                    </button>
-
-                    <div class="mt-8">
-                        <p class="text-slate-500 text-sm font-medium">
-                            <span id="toggleText">Don't have an account?</span>
-                            <button type="button" onclick="toggleMode()"
-                                class="text-indigo-400 font-black hover:text-white transition-colors ml-1"
-                                id="toggleBtn">Join Now</button>
-                        </p>
-                    </div>
-                </form>
+                    <span class="text-xs font-black uppercase text-indigo-300 tracking-[0.2em]">Joined the elite</span>
+                </div>
             </div>
+
+            <!-- Floating Decorative Elements -->
+            <div class="absolute top-20 right-20 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl animate-pulse"></div>
+            <div class="absolute bottom-40 left-10 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl animate-pulse"
+                style="animation-delay: 2s;"></div>
+        </div>
+
+        <!-- Right Side: Login Section -->
+        <div class="w-full lg:w-1/2 flex items-center justify-center p-6 relative">
+            <!-- Mobile Background (Only visible on small screens) -->
+            <div class="lg:hidden absolute inset-0 z-0">
+                <div class="orb bg-indigo-600 top-[-10%] left-[-10%]"></div>
+                <div class="orb bg-purple-600 bottom-[-10%] right-[-10%]" style="animation-delay: -5s;"></div>
+            </div>
+
+            <div class="w-full max-w-[480px] relative z-10 transition-all duration-1000 opacity-0 transform translate-y-10"
+                id="loginCard">
+                <div class="glass p-10 md:p-14 rounded-[3.5rem] text-center border-white/5">
+                    <!-- Logo Section -->
+                    <div
+                        class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center text-white mx-auto mb-10 shadow-2xl shadow-indigo-500/30 rotate-3 transform hover:rotate-0 transition-all cursor-pointer">
+                        <span class="text-4xl font-black">E</span>
+                    </div>
+
+                    <div id="authContent">
+                        <h1 class="text-4xl font-black text-white mb-3 tracking-tighter">Welcome Back</h1>
+                        <p class="text-slate-500 font-medium mb-10">Sign in to sync your progress</p>
+
+                        <form onsubmit="handleAuth(event)" class="space-y-4">
+                            <div id="registerFields" class="hidden space-y-4">
+                                <input type="text" id="name" placeholder="Full Name"
+                                    class="w-full px-8 py-5 rounded-2xl input-glass outline-none font-medium text-sm">
+                            </div>
+                            <input type="email" id="email" required placeholder="Gmail Address"
+                                class="w-full px-8 py-5 rounded-2xl input-glass outline-none font-medium text-sm">
+                            <div class="relative group">
+                                <input type="password" id="password" required placeholder="••••••••"
+                                    class="w-full px-8 py-5 rounded-2xl input-glass outline-none font-medium tracking-widest text-center text-sm transition-all focus:tracking-normal">
+                                <button type="button" onclick="togglePassword()"
+                                    class="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 hover:text-indigo-400 transition-colors">
+                                    <svg id="eyeIcon" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <button type="submit" id="submitBtn"
+                                class="w-full py-5 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-500 transition-all shadow-[0_20px_40px_-10px_rgba(79,70,229,0.4)] active:scale-95 mt-6 uppercase tracking-widest text-[10px]">
+                                Unlock Archive
+                            </button>
+
+                            <!-- Social Login Section -->
+                            <div class="mt-12">
+                                <div class="relative mb-8">
+                                    <div class="absolute inset-0 flex items-center">
+                                        <div class="w-full border-t border-white/10"></div>
+                                    </div>
+                                    <div
+                                        class="relative flex justify-center text-[9px] uppercase font-black tracking-[0.2em]">
+                                        <span class="bg-[#051124] px-4 text-slate-500">Quick Connect</span>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <button type="button" onclick="triggerSocial('Google')"
+                                        class="flex items-center justify-center gap-3 py-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white hover:text-black transition-all group">
+                                        <svg class="w-5 h-5" viewBox="0 0 24 24">
+                                            <path fill="currentColor"
+                                                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                                            <path fill="currentColor"
+                                                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                                            <path fill="currentColor"
+                                                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.29.81-.55z" />
+                                            <path fill="currentColor"
+                                                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                                        </svg>
+                                        <span class="text-[9px] font-black uppercase tracking-widest">Google</span>
+                                    </button>
+                                    <button type="button" onclick="triggerSocial('Facebook')"
+                                        class="flex items-center justify-center gap-3 py-4 rounded-2xl bg-[#1877F2]/10 border border-[#1877F2]/20 text-[#1877F2] hover:bg-[#1877F2] hover:text-white transition-all group">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z" />
+                                        </svg>
+                                        <span class="text-[9px] font-black uppercase tracking-widest">Meta</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mt-10">
+                                <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest">
+                                    <span id="toggleText">Access required?</span>
+                                    <button type="button" onclick="toggleMode()"
+                                        class="text-indigo-400 font-black hover:text-white transition-colors ml-1"
+                                        id="toggleBtn">Build Account</button>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Selector Modal (Simulated) -->
+    <div id="socialModal"
+        class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6 bg-black/95 backdrop-blur-2xl">
+        <div class="w-full max-w-sm glass p-10 rounded-[3.5rem] animate-fade-in text-center border-white/5">
+            <div id="socialLogo" class="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
+            </div>
+            <h2 class="text-3xl font-black text-white mb-2 tracking-tighter leading-none" id="socialTitle">Portal Access
+            </h2>
+            <p class="text-slate-500 text-xs font-medium mb-10">Authorize <b>ExamPaperLK</b> to sync your data</p>
+
+            <div id="accountList" class="space-y-3">
+                <!-- Accounts injected here -->
+            </div>
+
+            <button onclick="closeSocial()"
+                class="mt-10 text-[9px] font-black text-slate-600 uppercase tracking-[0.3em] hover:text-white transition-colors">Abort
+                Connection</button>
         </div>
     </div>
 
@@ -115,10 +289,61 @@
             isRegister = !isRegister;
             document.getElementById('registerFields').classList.toggle('hidden');
             document.getElementById('authContent').querySelector('h1').textContent = isRegister ? "Create Account" : "Welcome Back";
-            document.getElementById('authContent').querySelector('p').textContent = isRegister ? "Join 10,000+ students today" : "Sign in to access premium archives";
-            document.getElementById('submitBtn').textContent = isRegister ? "Create Free Account" : "Unlock Library";
-            document.getElementById('toggleText').textContent = isRegister ? "Already a member?" : "Don't have an account?";
-            document.getElementById('toggleBtn').textContent = isRegister ? "Sign In" : "Join Now";
+            document.getElementById('authContent').querySelector('p').textContent = isRegister ? "Join 10,000+ students today" : "Sign in to sync your progress";
+            document.getElementById('submitBtn').textContent = isRegister ? "Create Free Account" : "Unlock Archive";
+            document.getElementById('toggleText').textContent = isRegister ? "Already a member?" : "Access required?";
+            document.getElementById('toggleBtn').textContent = isRegister ? "Sign In" : "Build Account";
+        }
+
+        // --- Simulated Social Flows ---
+        const simulatedAccounts = [
+            { name: "Kaveesha Perera", email: "kaveeshap@gmail.com", avatar: "KP" },
+            { name: "Student Demo", email: "demo.student@exampaperlk.com", avatar: "SD" },
+            { name: "Advanced User", email: "user.advanced@gmail.com", avatar: "AU" }
+        ];
+
+        function triggerSocial(provider) {
+            const modal = document.getElementById('socialModal');
+            const logo = document.getElementById('socialLogo');
+            const title = document.getElementById('socialTitle');
+            const list = document.getElementById('accountList');
+
+            title.textContent = `Login via ${provider}`;
+            logo.className = `w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl ${provider === 'Google' ? 'bg-white' : 'bg-[#1877F2]'}`;
+            logo.innerHTML = provider === 'Google'
+                ? '<svg class="w-10 h-10" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.29.81-.55z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>'
+                : '<svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>';
+
+            list.innerHTML = simulatedAccounts.map(acc => `
+                <button onclick="confirmSocialAccount('${acc.name}', '${acc.email}')" class="w-full flex items-center gap-4 p-5 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all text-left">
+                    <div class="w-12 h-12 rounded-2xl bg-indigo-500/20 flex items-center justify-center font-bold text-indigo-400 text-sm">${acc.avatar}</div>
+                    <div>
+                        <div class="text-white font-black text-sm leading-tight">${acc.name}</div>
+                        <div class="text-slate-500 text-[10px] font-medium mt-1">${acc.email}</div>
+                    </div>
+                </button>
+            `).join('');
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeSocial() {
+            document.getElementById('socialModal').classList.add('hidden');
+        }
+
+        function confirmSocialAccount(name, email) {
+            const users = JSON.parse(localStorage.getItem('siteUsers')) || [];
+            let user = users.find(u => u.email === email);
+
+            if (!user) {
+                user = { name, email, password: 'social_login', joined: new Date().toISOString() };
+                users.push(user);
+                localStorage.setItem('siteUsers', JSON.stringify(users));
+            }
+
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            alert(`Authorized via Social Channel successfully!\nWelcome, ${name}`);
+            window.location.href = 'index.html';
         }
 
         function handleAuth(e) {
@@ -147,6 +372,18 @@
                 } else {
                     alert("Invalid credentials. Try again.");
                 }
+            }
+        }
+
+        function togglePassword() {
+            const passInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                eyeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />`;
+            } else {
+                passInput.type = 'password';
+                eyeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />`;
             }
         }
     </script>
