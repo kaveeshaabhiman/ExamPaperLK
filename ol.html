@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="si">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="auth-guard.js"></script>
+    <title>Ordinary Level - ExamPaperLK</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="tailwind-config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="font-sans text-gray-800 antialiased bg-gray-50/30">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-[100] transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div
+                class="flex justify-between items-center h-20 glass-card mt-4 rounded-3xl shadow-xl px-8 backdrop-blur-xl bg-white/80 border border-white/50">
+                <div class="flex-shrink-0 flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-purple-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg"
+                        data-logo-text>E</div>
+                    <span class="font-black text-2xl tracking-tighter text-gray-900" data-site-name>ExamPaperLK</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="flex items-center space-x-2" data-nav-menu></div>
+                </div>
+                <div class="md:hidden">
+                    <button class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-900">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <header class="pt-48 pb-16 px-4">
+        <div class="max-w-7xl mx-auto text-center animate-slide-up">
+            <span
+                class="inline-block px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] bg-indigo-50 text-indigo-600 mb-6">Exploration
+                Gallery</span>
+            <h1 class="text-5xl md:text-7xl font-black text-gray-900 tracking-tighter mb-4">G.C.E. Ordinary Level</h1>
+            <p class="text-xl text-gray-500 font-medium max-w-2xl mx-auto leading-relaxed">Select your subject to access
+                past papers, model papers, and comprehensive marking schemes.</p>
+        </div>
+    </header>
+
+    <!-- Subjects Grid -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-32">
+        <div id="subjects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Dynamically populated from siteConfig.subjects['OL'] -->
+        </div>
+    </section>
+
+    <!-- Global Footer -->
+    <footer></footer>
+
+    <script src="data.js"></script>
+    <script src="count-papers.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const grid = document.getElementById('subjects-grid');
+            const subjects = getSubjects('OL');
+
+            if (grid) {
+                grid.innerHTML = subjects.map(sub => `
+                    <a href="paper-view.html?subject=${sub.name}&level=OL" class="group relative bg-white p-10 rounded-[2.5rem] shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2 border border-gray-100 flex flex-col justify-between h-72">
+                        <div class="absolute top-0 right-0 w-40 h-40 bg-${sub.color}-500/5 rounded-bl-[6rem] -mr-10 -mt-10 group-hover:scale-110 transition-transform"></div>
+                        <div class="z-10">
+                            <div class="w-16 h-16 bg-gradient-to-br from-${sub.color}-500 to-${sub.color}-700 rounded-2xl flex items-center justify-center text-white mb-8 shadow-lg shadow-${sub.color}-100">
+                                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.432.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                </svg>
+                            </div>
+                            <h3 class="text-3xl font-black text-gray-900 tracking-tight leading-none mb-2">${sub.name}</h3>
+                            <p class="text-gray-400 font-bold uppercase tracking-widest text-[10px]">${sub.sinhala}</p>
+                        </div>
+                        <div class="z-10 flex justify-between items-center">
+                            <span data-count-target data-subject="${sub.name}" data-level="OL" class="text-[10px] font-black text-${sub.color}-600 bg-${sub.color}-50 px-4 py-1.5 rounded-full uppercase tracking-widest">Loading...</span>
+                            <div class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                            </div>
+                        </div>
+                    </a>
+                `).join('');
+
+                setTimeout(() => window.dispatchEvent(new Event('DOMContentLoaded')), 100);
+            }
+        });
+    </script>
+</body>
+
+</html>
