@@ -145,10 +145,48 @@ function updateSiteUI() {
 
     // Navigation Menu Generator
     const navContainers = document.querySelectorAll('[data-nav-menu]');
+
+    // First, clean up hardcoded logout buttons to avoid duplicates across different files.
+    document.querySelectorAll('nav button').forEach(btn => {
+        if (btn.textContent.trim().toLowerCase() === 'logout') {
+            btn.remove();
+        }
+    });
+
     navContainers.forEach(container => {
         container.innerHTML = siteConfig.navigation.map(link => `
             <a href="${link.url}" class="px-3 py-2 rounded-md text-sm font-semibold transition-all ${window.location.href.includes(link.url) ? 'text-primary bg-white shadow-sm' : 'text-gray-500 hover:text-primary'}">${link.label}</a>
-        `).join('');
+        `).join('') + `
+            <button onclick="localStorage.removeItem('currentUser'); location.replace('login.html');" class="ml-4 text-[10px] font-black text-red-400 hover:text-red-600 uppercase tracking-widest px-4 py-2 rounded-xl hover:bg-red-50 transition-all hidden md:inline-block">Logout</button>
+        `;
+    });
+
+    // Mobile Menu Hook & Interactivity
+    const mobileMenuBtns = document.querySelectorAll('nav .md\\\\:hidden button');
+    mobileMenuBtns.forEach(btn => {
+        if (!btn.dataset.menuAttached) {
+            btn.dataset.menuAttached = 'true';
+            btn.addEventListener('click', () => {
+                let mobileMenu = document.getElementById('global-mobile-menu');
+                if (!mobileMenu) {
+                    mobileMenu = document.createElement('div');
+                    mobileMenu.id = 'global-mobile-menu';
+                    mobileMenu.className = 'fixed top-24 left-4 right-4 bg-white/95 backdrop-blur-xl shadow-2xl rounded-3xl p-6 border border-white/50 z-[100] flex flex-col gap-4 transform transition-all animate-slide-up';
+                    mobileMenu.innerHTML = siteConfig.navigation.map(link => `
+                        <a href="${link.url}" class="px-4 py-3 rounded-xl text-lg font-black ${window.location.href.includes(link.url) ? 'bg-primary/10 text-primary' : 'text-gray-800 hover:bg-gray-50'} transition-all">${link.label}</a>
+                    `).join('') + `
+                        <div class="h-px bg-gray-100 my-2"></div>
+                        <button onclick="localStorage.removeItem('currentUser'); location.replace('login.html');" class="px-4 py-3 rounded-xl text-lg font-black text-red-500 hover:bg-red-50 transition-all text-left uppercase tracking-widest flex items-center gap-3">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                            Logout
+                        </button>
+                    `;
+                    document.body.appendChild(mobileMenu);
+                } else {
+                    mobileMenu.classList.toggle('hidden');
+                }
+            });
+        }
     });
 
     // Hero Updates

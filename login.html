@@ -110,23 +110,21 @@
 </head>
 
 <body class="min-h-screen flex items-center justify-center bg-[#050810] overflow-hidden">
-    <!-- Split Screen Container -->
-    <div class="flex w-full min-h-screen">
+    <!-- Persistent Background Image for All Devices -->
+    <div class="fixed inset-0 z-0">
+        <img src="https://images.unsplash.com/photo-1523240715181-2f0bd9a269cc?auto=format&fit=crop&q=80&w=2070"
+            class="w-full h-full object-cover opacity-30 lg:opacity-60 scale-110 animate-float"
+            style="filter: brightness(0.4) contrast(1.2);">
+        <div class="absolute inset-0 bg-gradient-to-tr from-indigo-900/40 via-transparent to-purple-900/20"></div>
+        <div class="absolute inset-0 backdrop-blur-[4px] lg:backdrop-blur-none"></div>
+    </div>
 
-        <!-- Left Side: Visual Immersive Area (Hidden on mobile) -->
-        <div class="hidden lg:flex w-1/2 relative overflow-hidden items-center justify-center p-20">
-            <!-- Background Image -->
-            <div class="absolute inset-0 z-0">
-                <img src="https://images.unsplash.com/photo-1523240715181-2f0bd9a269cc?auto=format&fit=crop&q=80&w=2070"
-                    class="w-full h-full object-cover opacity-60 scale-110 animate-float"
-                    style="filter: brightness(0.6) contrast(1.2);">
-                <!-- Animated Overlays -->
-                <div class="absolute inset-0 bg-gradient-to-tr from-indigo-900/80 via-transparent to-purple-900/40">
-                </div>
-                <div class="absolute inset-0 backdrop-blur-[2px]"></div>
-            </div>
+    <!-- Main Container -->
+    <div class="flex w-full min-h-screen relative z-10">
 
-            <div class="relative z-10 max-w-lg animate-slide-up">
+        <!-- Left Side: Visual Immersive Area (Responsive Visibility) -->
+        <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center p-20">
+            <div class="max-w-lg animate-slide-up">
                 <div class="w-20 h-2 bg-indigo-500 rounded-full mb-10"></div>
                 <h2 class="text-7xl font-black text-white tracking-tighter leading-none mb-8">Master Your <span
                         class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Future.</span>
@@ -158,11 +156,7 @@
 
         <!-- Right Side: Login Section -->
         <div class="w-full lg:w-1/2 flex items-center justify-center p-6 relative">
-            <!-- Mobile Background (Only visible on small screens) -->
-            <div class="lg:hidden absolute inset-0 z-0">
-                <div class="orb bg-indigo-600 top-[-10%] left-[-10%]"></div>
-                <div class="orb bg-purple-600 bottom-[-10%] right-[-10%]" style="animation-delay: -5s;"></div>
-            </div>
+
 
             <div class="w-full max-w-[480px] relative z-10 transition-all duration-1000 opacity-0 transform translate-y-10"
                 id="loginCard">
@@ -184,9 +178,10 @@
                             </div>
                             <input type="email" id="email" required placeholder="Gmail Address"
                                 class="w-full px-8 py-5 rounded-2xl input-glass outline-none font-medium text-sm">
+
                             <div class="relative group">
                                 <input type="password" id="password" required placeholder="••••••••"
-                                    class="w-full px-8 py-5 rounded-2xl input-glass outline-none font-medium tracking-widest text-center text-sm transition-all focus:tracking-normal">
+                                    class="w-full px-8 py-5 rounded-2xl input-glass outline-none font-medium tracking-widest text-center text-sm pr-16">
                                 <button type="button" onclick="togglePassword()"
                                     class="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 hover:text-indigo-400 transition-colors">
                                     <svg id="eyeIcon" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
@@ -212,12 +207,13 @@
                                     </div>
                                     <div
                                         class="relative flex justify-center text-[9px] uppercase font-black tracking-[0.2em]">
-                                        <span class="bg-[#051124] px-4 text-slate-500">Quick Connect</span>
+                                        <span class="bg-[#051124] px-4 text-slate-500">System Connect</span>
                                     </div>
                                 </div>
 
                                 <div class="grid grid-cols-2 gap-4">
-                                    <button type="button" onclick="triggerSocial('Google')"
+                                    <button type="button"
+                                        onclick="quickSocialLogin('Google Student', 'student.google@gmail.com')"
                                         class="flex items-center justify-center gap-3 py-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white hover:text-black transition-all group">
                                         <svg class="w-5 h-5" viewBox="0 0 24 24">
                                             <path fill="currentColor"
@@ -229,9 +225,10 @@
                                             <path fill="currentColor"
                                                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                                         </svg>
-                                        <span class="text-[9px] font-black uppercase tracking-widest">Google</span>
+                                        <span
+                                            class="text-[9px] font-black uppercase tracking-widest text-slate-300 group-hover:text-black">Google</span>
                                     </button>
-                                    <button type="button" onclick="triggerSocial('Facebook')"
+                                    <button type="button" onclick="quickSocialLogin('Meta User', 'user.meta@fb.com')"
                                         class="flex items-center justify-center gap-3 py-4 rounded-2xl bg-[#1877F2]/10 border border-[#1877F2]/20 text-[#1877F2] hover:bg-[#1877F2] hover:text-white transition-all group">
                                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                             <path
@@ -257,32 +254,24 @@
         </div>
     </div>
 
-    <!-- Account Selector Modal (Simulated) -->
-    <div id="socialModal"
-        class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6 bg-black/95 backdrop-blur-2xl">
-        <div class="w-full max-w-sm glass p-10 rounded-[3.5rem] animate-fade-in text-center border-white/5">
-            <div id="socialLogo" class="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
-            </div>
-            <h2 class="text-3xl font-black text-white mb-2 tracking-tighter leading-none" id="socialTitle">Portal Access
-            </h2>
-            <p class="text-slate-500 text-xs font-medium mb-10">Authorize <b>ExamPaperLK</b> to sync your data</p>
-
-            <div id="accountList" class="space-y-3">
-                <!-- Accounts injected here -->
-            </div>
-
-            <button onclick="closeSocial()"
-                class="mt-10 text-[9px] font-black text-slate-600 uppercase tracking-[0.3em] hover:text-white transition-colors">Abort
-                Connection</button>
-        </div>
-    </div>
-
     <script>
         let isRegister = false;
 
         window.onload = () => {
             const card = document.getElementById('loginCard');
             card.classList.remove('opacity-0', 'translate-y-10');
+
+            // Initialize a Demo user if the community is empty (First time visitors)
+            const users = JSON.parse(localStorage.getItem('siteUsers')) || [];
+            if (users.length === 0) {
+                users.push({
+                    name: "Abhiman Student",
+                    email: "student@exampaperlk.com",
+                    password: "123",
+                    joined: new Date().toISOString()
+                });
+                localStorage.setItem('siteUsers', JSON.stringify(users));
+            }
         }
 
         function toggleMode() {
@@ -295,55 +284,16 @@
             document.getElementById('toggleBtn').textContent = isRegister ? "Sign In" : "Build Account";
         }
 
-        // --- Simulated Social Flows ---
-        const simulatedAccounts = [
-            { name: "Kaveesha Perera", email: "kaveeshap@gmail.com", avatar: "KP" },
-            { name: "Student Demo", email: "demo.student@exampaperlk.com", avatar: "SD" },
-            { name: "Advanced User", email: "user.advanced@gmail.com", avatar: "AU" }
-        ];
-
-        function triggerSocial(provider) {
-            const modal = document.getElementById('socialModal');
-            const logo = document.getElementById('socialLogo');
-            const title = document.getElementById('socialTitle');
-            const list = document.getElementById('accountList');
-
-            title.textContent = `Login via ${provider}`;
-            logo.className = `w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl ${provider === 'Google' ? 'bg-white' : 'bg-[#1877F2]'}`;
-            logo.innerHTML = provider === 'Google'
-                ? '<svg class="w-10 h-10" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.29.81-.55z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>'
-                : '<svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>';
-
-            list.innerHTML = simulatedAccounts.map(acc => `
-                <button onclick="confirmSocialAccount('${acc.name}', '${acc.email}')" class="w-full flex items-center gap-4 p-5 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all text-left">
-                    <div class="w-12 h-12 rounded-2xl bg-indigo-500/20 flex items-center justify-center font-bold text-indigo-400 text-sm">${acc.avatar}</div>
-                    <div>
-                        <div class="text-white font-black text-sm leading-tight">${acc.name}</div>
-                        <div class="text-slate-500 text-[10px] font-medium mt-1">${acc.email}</div>
-                    </div>
-                </button>
-            `).join('');
-
-            modal.classList.remove('hidden');
-        }
-
-        function closeSocial() {
-            document.getElementById('socialModal').classList.add('hidden');
-        }
-
-        function confirmSocialAccount(name, email) {
-            const users = JSON.parse(localStorage.getItem('siteUsers')) || [];
-            let user = users.find(u => u.email === email);
-
-            if (!user) {
-                user = { name, email, password: 'social_login', joined: new Date().toISOString() };
-                users.push(user);
-                localStorage.setItem('siteUsers', JSON.stringify(users));
+        function togglePassword() {
+            const pass = document.getElementById('password');
+            const icon = document.getElementById('eyeIcon');
+            if (pass.type === 'password') {
+                pass.type = 'text';
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />';
+            } else {
+                pass.type = 'password';
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
             }
-
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            alert(`Authorized via Social Channel successfully!\nWelcome, ${name}`);
-            window.location.href = 'index.html';
         }
 
         function handleAuth(e) {
@@ -363,28 +313,49 @@
                 localStorage.setItem('siteUsers', JSON.stringify(users));
                 localStorage.setItem('currentUser', JSON.stringify(newUser));
                 alert("Account created successfully!");
-                window.location.href = 'index.html';
+                location.replace('./index.html');
             } else {
-                const user = users.find(u => u.email === email && u.password === password);
+                const user = users.find(u => u.email === email);
                 if (user) {
+                    if (user.password !== password) {
+                        alert("Invalid Credentials! Please try again.");
+                        return;
+                    }
+                    if (user.blocked) {
+                        alert("🚫 Your account has been blocked by the administrator.");
+                        return;
+                    }
                     localStorage.setItem('currentUser', JSON.stringify(user));
-                    window.location.href = 'index.html';
+                    location.replace('./index.html');
                 } else {
-                    alert("Invalid credentials. Try again.");
+                    // Auto-register to fix the mobile/different browser issue natively without backend
+                    const name = email.split('@')[0];
+                    const newUser = { name: name, email: email, password: password, joined: new Date().toISOString() };
+                    users.push(newUser);
+                    localStorage.setItem('siteUsers', JSON.stringify(users));
+                    localStorage.setItem('currentUser', JSON.stringify(newUser));
+                    location.replace('./index.html');
                 }
             }
         }
 
-        function togglePassword() {
-            const passInput = document.getElementById('password');
-            const eyeIcon = document.getElementById('eyeIcon');
-            if (passInput.type === 'password') {
-                passInput.type = 'text';
-                eyeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />`;
-            } else {
-                passInput.type = 'password';
-                eyeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />`;
+        function quickSocialLogin(name, email) {
+            const users = JSON.parse(localStorage.getItem('siteUsers')) || [];
+            let user = users.find(u => u.email === email);
+
+            if (!user) {
+                user = { name, email, password: 'social_login', joined: new Date().toISOString() };
+                users.push(user);
+                localStorage.setItem('siteUsers', JSON.stringify(users));
             }
+
+            if (user.blocked) {
+                alert("🚫 This account is restricted.");
+                return;
+            }
+
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            location.replace('./index.html');
         }
     </script>
 </body>
