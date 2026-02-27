@@ -172,9 +172,24 @@ function updateSiteUI() {
                     mobileMenu = document.createElement('div');
                     mobileMenu.id = 'global-mobile-menu';
                     mobileMenu.className = 'fixed top-24 left-4 right-4 bg-white/95 backdrop-blur-xl shadow-2xl rounded-3xl p-6 border border-white/50 z-[100] flex flex-col gap-4 transform transition-all animate-slide-up';
-                    mobileMenu.innerHTML = siteConfig.navigation.map(link => `
+
+                    // Desktop Links (Home, More) + dynamically rendering Categories
+                    const baseLinks = siteConfig.navigation.map(link => `
                         <a href="${link.url}" class="px-4 py-3 rounded-xl text-lg font-black ${window.location.href.includes(link.url) ? 'bg-primary/10 text-primary' : 'text-gray-800 hover:bg-gray-50'} transition-all">${link.label}</a>
-                    `).join('') + `
+                    `).join('');
+
+                    // Categories for quick access
+                    const categoryLinks = siteConfig.categories.map(cat => `
+                        <a href="paper-view.html?level=${cat.name}" class="px-4 py-3 rounded-xl text-lg font-black text-gray-800 hover:bg-gray-50 transition-all flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-lg bg-${cat.color}-100 text-${cat.color}-600 flex items-center justify-center text-xs">${cat.icon}</span> 
+                            ${cat.name} Papers
+                        </a>
+                    `).join('');
+
+                    mobileMenu.innerHTML = baseLinks + `
+                        <div class="h-px bg-gray-100 my-2"></div>
+                        <div class="px-2 py-1 text-[10px] font-black text-gray-400 uppercase tracking-widest">Library</div>
+                    ` + categoryLinks + `
                         <div class="h-px bg-gray-100 my-2"></div>
                         <button onclick="localStorage.removeItem('currentUser'); location.replace('login.html');" class="px-4 py-3 rounded-xl text-lg font-black text-red-500 hover:bg-red-50 transition-all text-left uppercase tracking-widest flex items-center gap-3">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
