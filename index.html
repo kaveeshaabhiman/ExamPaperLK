@@ -27,8 +27,6 @@
                 <!-- Navigation Hook -->
                 <div class="hidden md:block">
                     <div class="flex items-center space-x-2" data-nav-menu></div>
-                    <button onclick="localStorage.removeItem('currentUser'); location.reload();"
-                        class="ml-4 text-[10px] font-black text-red-400 hover:text-red-600 uppercase tracking-widest px-4 py-2 rounded-xl hover:bg-red-50 transition-all">Logout</button>
                 </div>
                 <div class="md:hidden">
                     <button class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-900">
@@ -59,13 +57,14 @@
             <h1 id="site-hero-title"
                 class="text-6xl md:text-8xl lg:text-[7rem] font-black tracking-tighter mb-8 leading-[1.1] animate-slide-up"
                 style="animation-delay: 0.1s;">
-                Loading Assets...
+                <span class="block text-slate-900 mb-2 drop-shadow-sm tracking-tighter">ExamPaperLK</span>
+                <span class="text-gradient drop-shadow-md inline-block">Your Paper Library</span>
             </h1>
 
             <p id="site-hero-subtitle"
                 class="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto mb-14 font-medium leading-relaxed animate-slide-up"
                 style="animation-delay: 0.2s;">
-                Fetching latest content from cloud...
+                Access thousands of past papers and marking schemes instantly.
             </p>
 
             <div class="flex flex-col sm:flex-row justify-center items-center gap-6 animate-slide-up"

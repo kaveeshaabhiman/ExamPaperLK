@@ -154,12 +154,41 @@ function updateSiteUI() {
     });
 
     navContainers.forEach(container => {
-        container.innerHTML = siteConfig.navigation.map(link => `
-            <a href="${link.url}" class="px-3 py-2 rounded-md text-sm font-semibold transition-all ${window.location.href.includes(link.url) ? 'text-primary bg-white shadow-sm' : 'text-gray-500 hover:text-primary'}">${link.label}</a>
-        `).join('') + `
-            <button onclick="localStorage.removeItem('currentUser'); location.replace('login.html');" class="ml-4 text-[10px] font-black text-red-400 hover:text-red-600 uppercase tracking-widest px-4 py-2 rounded-xl hover:bg-red-50 transition-all hidden md:inline-block">Logout</button>
+        container.innerHTML = siteConfig.navigation.map(link => {
+            if (link.label.toLowerCase() === 'more') {
+                return `<a href="${link.url}" class="group relative px-5 py-2.5 rounded-full text-sm font-black transition-all duration-300 ${window.location.href.includes(link.url) ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/25' : 'bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-600 hover:from-indigo-600 hover:to-purple-600 hover:text-white hover:shadow-lg hover:shadow-indigo-500/25'} flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                    ${link.label}
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                </a>`;
+            }
+            return `<a href="${link.url}" class="px-4 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${window.location.href.includes(link.url) ? 'text-indigo-600 bg-indigo-50' : 'text-gray-500 hover:text-indigo-600 hover:bg-gray-50'}">${link.label}</a>`;
+        }).join('') + `
+            <button onclick="localStorage.removeItem('currentUser'); location.replace('login.html');" class="ml-3 px-4 py-2 rounded-full text-[10px] font-black text-red-400 hover:text-white hover:bg-red-500 uppercase tracking-widest transition-all duration-300 border border-red-100 hover:border-red-500 hidden md:inline-flex items-center gap-2">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                Logout
+            </button>
         `;
     });
+
+    // Inject mobile menu styles once
+    if (!document.getElementById('mobile-menu-styles')) {
+        const menuStyles = document.createElement('style');
+        menuStyles.id = 'mobile-menu-styles';
+        menuStyles.innerHTML = `
+            @keyframes menuSlideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+            @keyframes menuSlideOut { from { transform: translateX(0); } to { transform: translateX(100%); } }
+            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+            @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+            @keyframes menuItemFade { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+            .mobile-menu-open { animation: menuSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+            .mobile-menu-close { animation: menuSlideOut 0.3s cubic-bezier(0.4, 0, 1, 1) forwards; }
+            .mobile-backdrop-open { animation: fadeIn 0.3s ease forwards; }
+            .mobile-backdrop-close { animation: fadeOut 0.3s ease forwards; }
+            .mobile-menu-item { animation: menuItemFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        `;
+        document.head.appendChild(menuStyles);
+    }
 
     // Mobile Menu Hook & Interactivity
     const mobileMenuBtns = document.querySelectorAll('nav .md\\\\:hidden button');
@@ -168,37 +197,117 @@ function updateSiteUI() {
             btn.dataset.menuAttached = 'true';
             btn.addEventListener('click', () => {
                 let mobileMenu = document.getElementById('global-mobile-menu');
+                let backdrop = document.getElementById('global-mobile-backdrop');
+
                 if (!mobileMenu) {
+                    // Create backdrop
+                    backdrop = document.createElement('div');
+                    backdrop.id = 'global-mobile-backdrop';
+                    backdrop.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm z-[99] mobile-backdrop-open';
+                    backdrop.addEventListener('click', closeMobileMenu);
+                    document.body.appendChild(backdrop);
+
+                    // Create menu panel
                     mobileMenu = document.createElement('div');
                     mobileMenu.id = 'global-mobile-menu';
-                    mobileMenu.className = 'fixed top-24 left-4 right-4 bg-white/95 backdrop-blur-xl shadow-2xl rounded-3xl p-6 border border-white/50 z-[100] flex flex-col gap-4 transform transition-all animate-slide-up';
+                    mobileMenu.className = 'fixed top-0 right-0 bottom-0 w-[85%] max-w-[380px] bg-white z-[100] mobile-menu-open flex flex-col shadow-[-10px_0_40px_rgba(0,0,0,0.15)]';
 
-                    // Desktop Links (Home, More) + dynamically rendering Categories
-                    const baseLinks = siteConfig.navigation.map(link => `
-                        <a href="${link.url}" class="px-4 py-3 rounded-xl text-lg font-black ${window.location.href.includes(link.url) ? 'bg-primary/10 text-primary' : 'text-gray-800 hover:bg-gray-50'} transition-all">${link.label}</a>
-                    `).join('');
+                    // Get current user info
+                    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                    const userName = currentUser ? currentUser.name : 'Student';
+                    const userEmail = currentUser ? currentUser.email : '';
+                    const userInitial = userName.charAt(0).toUpperCase();
 
-                    // Categories for quick access
-                    const categoryLinks = siteConfig.categories.map(cat => `
-                        <a href="paper-view.html?level=${cat.name}" class="px-4 py-3 rounded-xl text-lg font-black text-gray-800 hover:bg-gray-50 transition-all flex items-center gap-3">
-                            <span class="w-8 h-8 rounded-lg bg-${cat.color}-100 text-${cat.color}-600 flex items-center justify-center text-xs">${cat.icon}</span> 
-                            ${cat.name} Papers
+                    // Navigation Links
+                    const navLinks = siteConfig.navigation.map((link, i) => {
+                        const isActive = window.location.href.includes(link.url);
+                        const isMore = link.label.toLowerCase() === 'more';
+                        let icon = '<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>';
+                        if (isMore) icon = '<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>';
+                        return `<a href="${link.url}" class="mobile-menu-item flex items-center gap-4 px-5 py-4 rounded-2xl font-bold text-[15px] ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-gray-700 hover:bg-gray-50'} transition-all" style="animation-delay: ${0.1 + i * 0.05}s">
+                            <div class="w-10 h-10 rounded-xl ${isActive ? 'bg-indigo-100' : 'bg-gray-100'} flex items-center justify-center ${isActive ? 'text-indigo-600' : 'text-gray-400'}">${icon}</div>
+                            <span>${link.label}</span>
+                            ${isMore ? '<span class="ml-auto px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-600 text-[9px] font-black uppercase">New</span>' : ''}
+                        </a>`;
+                    }).join('');
+
+                    // Category Links
+                    const catIcons = { 'OL': '📘', 'AL': '📕', 'book': '📙', 'grad': '🎓' };
+                    const categoryLinks = siteConfig.categories.map((cat, i) => `
+                        <a href="paper-view.html?level=${cat.name}" class="mobile-menu-item flex items-center gap-4 px-5 py-3.5 rounded-2xl text-gray-700 hover:bg-gray-50 transition-all" style="animation-delay: ${0.25 + i * 0.05}s">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-${cat.color}-50 to-${cat.color}-100 flex items-center justify-center text-lg">${catIcons[cat.icon] || '📄'}</div>
+                            <div>
+                                <span class="font-bold text-sm block">${cat.name} Papers</span>
+                                <span class="text-[10px] text-gray-400 font-medium">${cat.fullName}</span>
+                            </div>
+                            <svg class="w-4 h-4 text-gray-300 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                         </a>
                     `).join('');
 
-                    mobileMenu.innerHTML = baseLinks + `
-                        <div class="h-px bg-gray-100 my-2"></div>
-                        <div class="px-2 py-1 text-[10px] font-black text-gray-400 uppercase tracking-widest">Library</div>
-                    ` + categoryLinks + `
-                        <div class="h-px bg-gray-100 my-2"></div>
-                        <button onclick="localStorage.removeItem('currentUser'); location.replace('login.html');" class="px-4 py-3 rounded-xl text-lg font-black text-red-500 hover:bg-red-50 transition-all text-left uppercase tracking-widest flex items-center gap-3">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                            Logout
-                        </button>
+                    const navDelay = siteConfig.navigation.length;
+                    const catDelay = siteConfig.categories.length;
+                    const logoutDelay = 0.25 + (navDelay + catDelay) * 0.05;
+
+                    mobileMenu.innerHTML = `
+                        <!-- Header with close button -->
+                        <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100 mobile-menu-item" style="animation-delay: 0s">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-lg font-black shadow-lg shadow-indigo-200">${userInitial}</div>
+                                <div>
+                                    <div class="font-black text-gray-900 text-sm">${userName}</div>
+                                    <div class="text-[11px] text-gray-400 font-medium truncate max-w-[180px]">${userEmail}</div>
+                                </div>
+                            </div>
+                            <button onclick="closeMobileMenu()" class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-all">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </div>
+
+                        <!-- Scrollable Content -->
+                        <div class="flex-1 overflow-y-auto px-4 py-4 space-y-1">
+                            <!-- Navigation Links -->
+                            <div class="mb-2">
+                                <div class="px-4 py-2 text-[9px] font-black text-gray-300 uppercase tracking-[0.2em] mobile-menu-item" style="animation-delay: 0.08s">Navigation</div>
+                                ${navLinks}
+                            </div>
+
+                            <!-- Divider -->
+                            <div class="h-px bg-gray-100 mx-4 my-3"></div>
+
+                            <!-- Library Categories -->
+                            <div>
+                                <div class="px-4 py-2 text-[9px] font-black text-gray-300 uppercase tracking-[0.2em] mobile-menu-item" style="animation-delay: 0.2s">
+                                    <span class="flex items-center gap-2">📚 Paper Library</span>
+                                </div>
+                                ${categoryLinks}
+                            </div>
+                        </div>
+
+                        <!-- Bottom: Logout Button -->
+                        <div class="p-4 border-t border-gray-100 mobile-menu-item" style="animation-delay: ${logoutDelay}s">
+                            <button onclick="localStorage.removeItem('currentUser'); location.replace('login.html');" class="w-full flex items-center justify-center gap-3 px-5 py-4 rounded-2xl bg-red-50 hover:bg-red-500 text-red-500 hover:text-white font-black text-xs uppercase tracking-[0.15em] transition-all duration-300 group">
+                                <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                                Sign Out
+                            </button>
+                        </div>
                     `;
                     document.body.appendChild(mobileMenu);
+                    document.body.style.overflow = 'hidden';
                 } else {
-                    mobileMenu.classList.toggle('hidden');
+                    // Toggle menu
+                    if (mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.remove('hidden');
+                        mobileMenu.classList.remove('mobile-menu-close');
+                        mobileMenu.classList.add('mobile-menu-open');
+                        if (backdrop) {
+                            backdrop.classList.remove('hidden');
+                            backdrop.classList.remove('mobile-backdrop-close');
+                            backdrop.classList.add('mobile-backdrop-open');
+                        }
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        closeMobileMenu();
+                    }
                 }
             });
         }
@@ -287,6 +396,25 @@ function updateSiteUI() {
             </div>
         `;
     });
+}
+
+// Global function to close mobile menu with animation
+function closeMobileMenu() {
+    const mobileMenu = document.getElementById('global-mobile-menu');
+    const backdrop = document.getElementById('global-mobile-backdrop');
+    if (mobileMenu) {
+        mobileMenu.classList.remove('mobile-menu-open');
+        mobileMenu.classList.add('mobile-menu-close');
+    }
+    if (backdrop) {
+        backdrop.classList.remove('mobile-backdrop-open');
+        backdrop.classList.add('mobile-backdrop-close');
+    }
+    document.body.style.overflow = 'auto';
+    setTimeout(() => {
+        if (mobileMenu) mobileMenu.classList.add('hidden');
+        if (backdrop) backdrop.classList.add('hidden');
+    }, 300);
 }
 
 document.addEventListener('DOMContentLoaded', updateSiteUI);
