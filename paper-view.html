@@ -40,21 +40,36 @@
     </nav>
 
     <!-- Header -->
-    <header class="pt-48 pb-12 px-4 bg-white border-b border-gray-100">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end gap-6">
-            <div class="animate-slide-up">
+    <header
+        class="relative pt-48 pb-16 px-4 overflow-hidden bg-gradient-to-b from-white to-slate-50 border-b border-gray-100">
+        <!-- Dynamic Background Elements -->
+        <div class="blob w-[30rem] h-[30rem] bg-indigo-500 top-[-20%] left-[-10%] opacity-20"></div>
+        <div class="blob w-[25rem] h-[25rem] bg-pink-400 bottom-[-10%] right-[-10%] animate-float-reverse opacity-20">
+        </div>
+
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end gap-6 relative z-10">
+            <div
+                class="animate-slide-up bg-white/40 p-10 rounded-[2.5rem] backdrop-blur-3xl border border-white flex-1 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                 <div id="level-badge"
-                    class="inline-block px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-gray-100 text-gray-500 mb-4">
+                    class="inline-block px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] bg-indigo-50 text-indigo-500 mb-6 shadow-sm border border-indigo-100/50">
                     Loading Level...</div>
                 <h1 id="subject-title"
-                    class="text-4xl md:text-6xl font-black text-gray-900 tracking-tighter leading-none mb-4">Subject
+                    class="text-5xl md:text-7xl font-black text-slate-800 tracking-tighter leading-none mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-600 group-hover:to-pink-600 transition-all">
+                    Subject
                 </h1>
-                <p class="text-gray-400 font-medium">Download past papers and marking schemes for free.</p>
+                <p class="text-slate-500 font-medium text-lg leading-relaxed max-w-xl">Download past papers and marking
+                    schemes for free securely from our vault.</p>
             </div>
-            <div class="flex items-center gap-4 animate-slide-up" style="animation-delay: 0.2s;">
-                <div id="paper-count-badge"
-                    class="px-6 py-3 bg-gray-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest">0
-                    PAPERS</div>
+            <div class="flex items-center gap-4 animate-slide-up hidden md:flex" style="animation-delay: 0.2s;">
+                <div class="flex flex-col items-end">
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Available
+                        Documents</span>
+                    <div id="paper-count-badge"
+                        class="px-8 py-4 bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-[2rem] font-black text-sm uppercase tracking-widest shadow-2xl flex items-center gap-3">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="count-value">0</span> PAPERS
+                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -139,7 +154,12 @@
                 return lvlMatch && subMatch;
             });
 
-            document.getElementById('paper-count-badge').textContent = filtered.length + " PAPERS";
+            const badgeEl = document.getElementById('paper-count-badge');
+            if (badgeEl.querySelector('.count-value')) {
+                badgeEl.querySelector('.count-value').textContent = filtered.length;
+            } else {
+                badgeEl.textContent = filtered.length + " PAPERS";
+            }
 
             // Grouping Logic
             const groups = filtered.reduce((acc, p) => {
@@ -164,21 +184,28 @@
                             </div>
                             <div class="grid grid-cols-1 gap-4">
                                 ${papers.map(p => `
-                                    <div class="group bg-white p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl border border-gray-100 flex flex-col md:flex-row justify-between items-center transition-all hover:-translate-y-1">
-                                        <div class="flex items-center gap-6 text-center md:text-left">
-                                            <div class="hidden md:flex w-14 h-14 bg-gray-50 rounded-2xl items-center justify-center font-black text-lg text-gray-400 border border-gray-100">${p.year}</div>
-                                            <div>
-                                                <h3 class="text-2xl font-black text-gray-900 tracking-tight leading-none mb-2">${p.title}</h3>
-                                                <div class="flex flex-wrap items-center justify-center md:justify-start gap-2">
-                                                    <span class="text-[9px] font-black uppercase tracking-widest px-3 py-1 bg-gray-50 rounded-full text-gray-300">${p.type}</span>
-                                                    ${p.part ? `<span class="text-[9px] font-black uppercase tracking-widest px-3 py-1 bg-amber-50 rounded-full text-amber-600">${p.part}</span>` : ''}
-                                                    <span class="text-[9px] font-black uppercase tracking-widest px-3 py-1 bg-emerald-50 rounded-full text-emerald-600">${p.medium}</span>
+                                    <div class="group bg-white/60 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_20px_40px_-20px_rgba(79,70,229,0.3)] border border-white hover:border-indigo-100 flex flex-col md:flex-row justify-between items-center transition-all duration-500 hover:-translate-y-2 relative overflow-hidden">
+                                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-white/0 group-hover:-translate-x-full transition-all duration-1000 transform translate-x-[200%] z-0"></div>
+                                        <div class="flex items-center gap-6 text-center md:text-left relative z-10 w-full md:w-auto">
+                                            <div class="hidden md:flex w-16 h-16 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl items-center justify-center font-black text-xl text-indigo-500 border border-white shadow-inner group-hover:scale-110 transition-transform duration-500">${p.year}</div>
+                                            <div class="w-full">
+                                                <h3 class="text-2xl font-black text-slate-800 tracking-tight leading-none mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-600 group-hover:to-pink-600 transition-all">${p.title}</h3>
+                                                <div class="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                                                    <span class="text-[10px] font-black uppercase tracking-[0.2em] px-4 py-1.5 bg-slate-50 border border-slate-100 rounded-full text-slate-400">${p.type}</span>
+                                                    ${p.part ? `<span class="text-[10px] font-black uppercase tracking-[0.2em] px-4 py-1.5 bg-amber-50 border border-amber-100/50 rounded-full text-amber-600">${p.part}</span>` : ''}
+                                                    <span class="text-[10px] font-black uppercase tracking-[0.2em] px-4 py-1.5 bg-emerald-50 border border-emerald-100/50 rounded-full text-emerald-600">${p.medium}</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="flex gap-4 mt-8 md:mt-0 w-full md:w-auto">
-                                            <button onclick="openViewer('${p.viewLink}', '${p.title}')" class="flex-1 md:px-10 py-5 bg-white border-2 border-slate-100 rounded-2xl text-[10px] font-black hover:border-primary hover:text-primary transition-all uppercase tracking-widest">View</button>
-                                            <a href="${p.downloadLink}" download class="flex-1 md:px-10 py-5 bg-primary text-white rounded-2xl text-[10px] font-black text-center shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all uppercase tracking-widest">Download</a>
+                                        <div class="flex gap-4 mt-8 md:mt-0 w-full md:w-auto relative z-10">
+                                            <button onclick="openViewer('${p.viewLink}', '${p.title}')" class="flex-1 md:w-32 py-4 bg-white border-2 border-slate-100 rounded-[1.25rem] text-[10px] font-black group-hover:border-indigo-500 group-hover:text-indigo-600 text-slate-400 hover:shadow-lg transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-2">
+                                                <svg class="w-4 h-4 hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                                View
+                                            </button>
+                                            <a href="${p.downloadLink}" download class="flex-1 md:w-40 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-[1.25rem] text-[10px] font-black text-center shadow-lg hover:shadow-indigo-500/50 hover:scale-105 transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-2">
+                                                <svg class="w-4 h-4 hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                                Download
+                                            </a>
                                         </div>
                                     </div>
                                 `).join('')}

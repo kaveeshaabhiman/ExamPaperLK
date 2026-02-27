@@ -208,10 +208,10 @@ function updateSiteUI() {
     const hTitle = document.getElementById('site-hero-title');
     const hSub = document.getElementById('site-hero-subtitle');
     const hBtn = document.getElementById('site-hero-button');
-    if (hTitle) hTitle.innerHTML = `<span class="block text-gray-900 mb-2">${siteConfig.siteName}</span> <span class="text-gradient">${siteConfig.heroTitle}</span>`;
+    if (hTitle) hTitle.innerHTML = `<span class="block text-slate-900 mb-2 drop-shadow-sm tracking-tighter">${siteConfig.siteName}</span> <span class="text-gradient drop-shadow-md inline-block animate-pulse-glow" style="animation-duration: 4s;">${siteConfig.heroTitle}</span>`;
     if (hSub) hSub.textContent = siteConfig.heroSubtitle;
     if (hBtn) {
-        hBtn.textContent = siteConfig.heroButtonText;
+        hBtn.innerHTML = `<span class="relative z-10">${siteConfig.heroButtonText}</span><div class="absolute inset-0 h-full w-full bg-gradient-to-r from-purple-600 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>`;
         hBtn.href = siteConfig.heroButtonLink;
     }
 
@@ -238,14 +238,17 @@ function updateSiteUI() {
     const featureGrid = document.getElementById('feature-grid');
     if (featureGrid && siteConfig.features) {
         // Icons mapping for variety
-        const icons = { zap: '<path d="M13 10V3L4 14h7v7l9-11h-7z"/>', download: '<path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>', check: '<path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>' };
+        const icons = { zap: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>', download: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>', check: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>' };
         featureGrid.innerHTML = siteConfig.features.map(f => `
-            <div class="glass-card p-8 rounded-3xl hover:bg-white transition-all group">
-                <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-all">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">${icons[f.icon] || icons.zap}</svg>
+            <div class="bg-white/70 backdrop-blur-xl p-10 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white hover:border-indigo-100 transition-all duration-500 hover:-translate-y-3 cursor-default hover-lift relative overflow-hidden group">
+                <div class="absolute top-[-20%] right-[-20%] w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-all duration-1000 group-hover:scale-150"></div>
+                <div class="relative z-10">
+                    <div class="w-16 h-16 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl flex items-center justify-center text-indigo-500 mb-8 border border-white shadow-inner group-hover:scale-110 transition-transform duration-500 group-hover:rotate-3">
+                        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">${icons[f.icon] || icons.zap}</svg>
+                    </div>
+                    <h3 class="text-2xl font-black text-slate-800 tracking-tight leading-none mb-4 group-hover:text-indigo-600 transition-colors">${f.title}</h3>
+                    <p class="text-slate-500 font-medium leading-relaxed">${f.desc}</p>
                 </div>
-                <h3 class="text-xl font-black text-gray-900 mb-2">${f.title}</h3>
-                <p class="text-gray-500 font-medium leading-relaxed">${f.desc}</p>
             </div>
         `).join('');
     }
