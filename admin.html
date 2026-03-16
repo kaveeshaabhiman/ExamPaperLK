@@ -1,0 +1,1539 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Master Site Controller - No-Code</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ["Plus Jakarta Sans", "sans-serif"] },
+            colors: { primary: "#4f46e5" },
+          },
+        },
+      };
+    </script>
+    <style>
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #e2e8f0;
+        border-radius: 10px;
+      }
+
+      .glass {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+      }
+
+      /* Clean Input Styles for Admin Panel */
+      .input-box {
+        width: 100%;
+        padding: 0.875rem 1.25rem;
+        background-color: #f8fafc;
+        border: 2px solid #f1f5f9;
+        border-radius: 1rem;
+        outline: none;
+        transition: all 0.2s ease;
+        font-weight: 700;
+        color: #0f172a;
+        font-size: 0.875rem;
+        pointer-events: auto !important;
+        user-select: text !important;
+        cursor: text;
+        position: relative;
+        z-index: 10;
+      }
+      select.input-box {
+        cursor: pointer;
+        padding-right: 2.5rem;
+      }
+      .input-box:focus {
+        background-color: #ffffff;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+      }
+      .input-box::placeholder {
+        color: #cbd5e1;
+        font-weight: 600;
+      }
+      .input-label {
+        display: block;
+        font-size: 0.65rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: #64748b;
+        margin-bottom: 0.35rem;
+        margin-left: 0.25rem;
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-[#f8fafc] min-h-screen font-sans text-slate-900 selection:bg-indigo-100"
+  >
+    <div
+      id="loginSection"
+      class="hidden min-h-screen flex items-center justify-center p-6"
+    >
+      <div class="w-full max-w-md animate-slide-up">
+        <div
+          class="bg-white p-12 rounded-[3rem] shadow-2xl border border-slate-100 text-center"
+        >
+          <div
+            class="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center text-white mx-auto mb-8 shadow-2xl shadow-indigo-200"
+          >
+            <svg
+              class="w-10 h-10"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              />
+            </svg>
+          </div>
+          <h1 class="text-3xl font-black mb-2">Master Login</h1>
+          <p class="text-slate-400 font-medium mb-10">
+            Enter authorization key to unlock controls
+          </p>
+          <form onsubmit="handleLogin(event)" class="space-y-4">
+            <input
+              type="password"
+              id="password"
+              required
+              placeholder="••••••••"
+              class="w-full px-8 py-5 bg-slate-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-indigo-600 outline-none transition-all font-black tracking-widest text-center"
+            />
+            <button
+              type="submit"
+              class="w-full py-5 bg-slate-900 text-white font-black rounded-2xl hover:bg-black transition-all shadow-xl active:scale-95"
+            >
+              Unlock Dashboard
+            </button>
+            <p id="errorMsg" class="hidden text-red-500 font-bold text-xs mt-4">
+              Invalid authorization key. Access denied.
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="dashboardSection" class="hidden flex h-screen overflow-hidden">
+      <!-- Sidebar -->
+      <aside
+        class="w-72 bg-white border-r border-slate-100 flex flex-col p-8 drawer"
+      >
+        <div class="flex items-center gap-4 mb-12">
+          <div
+            class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-black shadow-lg"
+          >
+            E
+          </div>
+          <div>
+            <h3 class="font-black text-lg leading-none">Console</h3>
+            <p
+              class="text-[10px] uppercase font-black text-slate-300 tracking-widest mt-1"
+            >
+              v3.0 No-Code
+            </p>
+          </div>
+        </div>
+
+        <nav class="space-y-2 flex-1 scrollbar-hide overflow-y-auto">
+          <button
+            onclick="switchTab('papers')"
+            id="nav-papers"
+            class="nav-btn group w-full flex items-center gap-3 px-5 py-4 rounded-2xl font-bold text-sm transition-all hover:bg-slate-50 text-slate-400"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            Publish Papers
+          </button>
+          <button
+            onclick="switchTab('design')"
+            id="nav-design"
+            class="nav-btn w-full flex items-center gap-3 px-5 py-4 rounded-2xl font-bold text-sm transition-all hover:bg-slate-50 text-slate-400"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+              />
+            </svg>
+            Design & Branding
+          </button>
+          <button
+            onclick="switchTab('pages')"
+            id="nav-pages"
+            class="nav-btn w-full flex items-center gap-3 px-5 py-4 rounded-2xl font-bold text-sm transition-all hover:bg-slate-50 text-slate-400"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+            Menu & Navigation
+          </button>
+          <button
+            onclick="switchTab('content')"
+            id="nav-content"
+            class="nav-btn w-full flex items-center gap-3 px-5 py-4 rounded-2xl font-bold text-sm transition-all hover:bg-slate-50 text-slate-400"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
+            </svg>
+            Hero & Landing
+          </button>
+          <button
+            onclick="switchTab('structure')"
+            id="nav-structure"
+            class="nav-btn w-full flex items-center gap-3 px-5 py-4 rounded-2xl font-bold text-sm transition-all hover:bg-slate-50 text-slate-400"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+              />
+            </svg>
+            Levels & Subjects
+          </button>
+          <button
+            onclick="switchTab('system')"
+            id="nav-system"
+            class="nav-btn w-full flex items-center gap-3 px-5 py-4 rounded-2xl font-bold text-sm transition-all hover:bg-slate-50 text-slate-400"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+            System Control
+          </button>
+          <div
+            id="super-admin-links"
+            class="hidden space-y-2 mt-4 pt-4 border-t border-slate-50"
+          >
+            <button
+              onclick="switchTab('users')"
+              id="nav-users"
+              class="nav-btn w-full flex items-center gap-3 px-5 py-4 rounded-2xl font-bold text-sm transition-all hover:bg-slate-50 text-slate-400"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197"
+                />
+              </svg>
+              Site Users
+            </button>
+            <button
+              onclick="switchTab('admins')"
+              id="nav-admins"
+              class="nav-btn w-full flex items-center gap-3 px-5 py-4 rounded-2xl font-bold text-sm transition-all hover:bg-slate-50 text-slate-400"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-7.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
+              </svg>
+              Admin Settings
+            </button>
+          </div>
+        </nav>
+
+        <button
+          onclick="logout()"
+          class="mt-8 flex items-center gap-3 px-5 py-4 rounded-2xl font-black text-xs text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 16l4-4m0 0l-4-4m4 4H7"
+            />
+          </svg>
+          EXIT CONSOLE
+        </button>
+      </aside>
+
+      <!-- Main Workspace -->
+      <main class="flex-1 bg-slate-50 overflow-y-auto p-12 custom-scrollbar">
+        <!-- TAB: PAPERS -->
+        <div
+          id="content-papers"
+          class="tab-content hidden animate-fade-in max-w-5xl mx-auto space-y-12"
+        >
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1">
+              <form
+                onsubmit="handlePaperSubmit(event)"
+                class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 flex flex-col gap-5"
+              >
+                <h3
+                  class="text-xl font-black text-slate-900 border-b pb-4 border-slate-50 uppercase tracking-widest text-xs"
+                >
+                  New Content Entry
+                </h3>
+
+                <div>
+                  <label class="input-label">Exam Year</label>
+                  <select id="pyear" required class="input-box"></select>
+                </div>
+
+                <div>
+                  <label class="input-label">Academic Level (Category)</label>
+                  <select
+                    id="plevel"
+                    onchange="populateSubjectDropdown()"
+                    class="input-box"
+                  ></select>
+                </div>
+
+                <div>
+                  <label class="input-label">Subject</label>
+                  <select id="psubject" class="input-box"></select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="input-label">Paper Type</label>
+                    <select id="ptype" class="input-box"></select>
+                  </div>
+                  <div>
+                    <label class="input-label">Part (Optional)</label>
+                    <select id="ppart" class="input-box"></select>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="input-label">Display Title</label>
+                  <input
+                    type="text"
+                    id="ptitle"
+                    required
+                    placeholder="e.g. 2024 Maths Part I"
+                    class="input-box"
+                  />
+                </div>
+
+                <div>
+                  <label class="input-label">Google Drive URL</label>
+                  <input
+                    type="url"
+                    id="purl"
+                    required
+                    placeholder="https://drive.google.com/..."
+                    class="input-box font-mono text-[10px]"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  class="w-full mt-2 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-[1rem] shadow-xl shadow-indigo-100 active:scale-95 transition-all uppercase tracking-widest text-xs"
+                >
+                  PUBLISH LIVE
+                </button>
+              </form>
+            </div>
+            <div class="lg:col-span-2">
+              <div
+                class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden"
+              >
+                <div
+                  class="p-8 border-b border-slate-50 flex flex-col md:flex-row justify-between items-center bg-slate-50/30 gap-4"
+                >
+                  <h3 class="font-black text-slate-900">
+                    Current Library Content
+                  </h3>
+                  <div class="flex items-center gap-3">
+                    <input
+                      type="text"
+                      id="paperSearch"
+                      oninput="renderPapers()"
+                      placeholder="Search papers..."
+                      class="px-4 py-2 bg-white border border-slate-100 rounded-xl text-xs font-bold outline-none focus:border-indigo-300 transition-all"
+                    />
+                    <span
+                      id="paperCount"
+                      class="px-4 py-1.5 bg-white border border-slate-100 rounded-full text-[10px] font-black uppercase text-indigo-600 whitespace-nowrap"
+                      >0 Items</span
+                    >
+                  </div>
+                </div>
+                <div
+                  id="paperList"
+                  class="divide-y divide-slate-50 max-h-[500px] overflow-y-auto custom-scrollbar"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: DESIGN & BRANDING -->
+        <div
+          id="content-design"
+          class="tab-content hidden animate-fade-in max-w-3xl mx-auto bg-white p-12 rounded-[3.5rem] shadow-xl border border-slate-100"
+        >
+          <h3 class="text-3xl font-black mb-8">Design Identity</h3>
+          <form onsubmit="handleDesignSave(event)" class="space-y-10">
+            <div class="grid grid-cols-2 gap-8">
+              <div>
+                <label class="input-label">Website Identity</label>
+                <input
+                  type="text"
+                  id="set-name"
+                  class="input-box text-center"
+                />
+              </div>
+              <div>
+                <label class="input-label">Logo Text</label>
+                <input
+                  type="text"
+                  id="set-logo-text"
+                  class="input-box text-center"
+                />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-8">
+              <div>
+                <label class="input-label">Core Theme Color</label>
+                <input
+                  type="color"
+                  id="set-primary"
+                  class="w-full h-[60px] p-2 bg-white border-2 border-slate-100 rounded-xl cursor-pointer hover:border-indigo-400 transition-colors"
+                />
+              </div>
+              <div>
+                <label class="input-label">Accent Color</label>
+                <input
+                  type="color"
+                  id="set-accent"
+                  class="w-full h-[60px] p-2 bg-white border-2 border-slate-100 rounded-xl cursor-pointer hover:border-indigo-400 transition-colors"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="input-label"
+                >Advanced Style Injector (Custom CSS)</label
+              >
+              <textarea
+                id="set-css"
+                rows="4"
+                placeholder="/* Add custom styles here */"
+                class="input-box font-mono text-xs max-h-[250px] min-h-[100px]"
+              ></textarea>
+            </div>
+
+            <button
+              type="submit"
+              class="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-[1rem] shadow-xl shadow-indigo-100 mt-6 active:scale-95 transition-all text-sm tracking-widest uppercase"
+            >
+              SYNCHRONIZE DESIGN
+            </button>
+          </form>
+        </div>
+
+        <!-- TAB: MENU & NAVIGATION -->
+        <div
+          id="content-pages"
+          class="tab-content hidden animate-fade-in max-w-3xl mx-auto space-y-8"
+        >
+          <div
+            class="bg-white p-10 rounded-[3rem] shadow-xl border border-slate-100"
+          >
+            <h3 class="text-2xl font-black mb-6">Navigation Architect</h3>
+            <p class="text-slate-400 text-sm font-medium mb-8">
+              Add or remove links from your top navigation bar.
+            </p>
+            <form
+              onsubmit="handleNavAdd(event)"
+              class="flex items-end gap-3 mb-8"
+            >
+              <div class="flex-1">
+                <label class="input-label">Link Label</label>
+                <input
+                  type="text"
+                  id="nav-label"
+                  placeholder="e.g. Home"
+                  class="input-box"
+                />
+              </div>
+              <div class="flex-1">
+                <label class="input-label">Target URL</label>
+                <input
+                  type="text"
+                  id="nav-url"
+                  placeholder="e.g. index.html"
+                  class="input-box font-mono text-xs"
+                />
+              </div>
+              <button
+                type="submit"
+                class="w-[52px] h-[52px] bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-black text-xl flex items-center justify-center transition-colors shadow-lg active:scale-95"
+              >
+                +
+              </button>
+            </form>
+            <div id="nav-list" class="space-y-3"></div>
+          </div>
+        </div>
+
+        <!-- TAB: HERO & LANDING -->
+        <div
+          id="content-content"
+          class="tab-content hidden animate-fade-in max-w-3xl mx-auto space-y-8 text-center bg-white p-12 rounded-[3.5rem] shadow-xl border border-slate-100"
+        >
+          <h3 class="text-3xl font-black mb-8">Main Page Story</h3>
+          <form onsubmit="handleLandingSave(event)" class="space-y-8 text-left">
+            <div>
+              <label class="input-label">Hero Catchphrase</label>
+              <input
+                type="text"
+                id="set-hero-title"
+                class="input-box font-black text-xl"
+              />
+            </div>
+
+            <div>
+              <label class="input-label">Detailed Subtitle</label>
+              <textarea
+                id="set-hero-sub"
+                rows="3"
+                class="input-box font-medium"
+              ></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <label class="input-label">Call to Action Button</label>
+                <input
+                  type="text"
+                  id="set-hero-btn"
+                  class="input-box font-bold"
+                />
+              </div>
+              <div>
+                <label class="input-label">Button Destination Link</label>
+                <input
+                  type="text"
+                  id="set-hero-link"
+                  class="input-box font-mono text-xs"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              class="w-full py-5 bg-slate-900 hover:bg-slate-800 text-white font-black rounded-xl shadow-xl mt-4 active:scale-95 transition-all uppercase tracking-widest text-sm"
+            >
+              PULL IDENTITY LIVE
+            </button>
+          </form>
+        </div>
+
+        <!-- TAB: MASTER STRUCTURE -->
+        <div
+          id="content-structure"
+          class="tab-content hidden animate-fade-in max-w-6xl mx-auto space-y-8"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Column 1: Levels & Subjects -->
+            <div class="space-y-8">
+              <div
+                class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100"
+              >
+                <h3 class="font-black text-lg mb-6 flex items-center gap-2">
+                  <span class="w-2 h-8 bg-indigo-600 rounded-full"></span>
+                  Categories (Levels)
+                </h3>
+                <form
+                  onsubmit="handleCategoryAdd(event)"
+                  class="space-y-4 mb-6"
+                >
+                  <div>
+                    <label class="input-label">Category ID</label>
+                    <input
+                      type="text"
+                      id="cat-id"
+                      placeholder="e.g. grade5"
+                      required
+                      class="input-box"
+                    />
+                  </div>
+                  <div>
+                    <label class="input-label">Category Name</label>
+                    <input
+                      type="text"
+                      id="cat-name"
+                      placeholder="e.g. Scholarship"
+                      required
+                      class="input-box"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl text-xs uppercase tracking-widest transition-colors shadow-lg shadow-indigo-100 active:scale-95"
+                  >
+                    Add Category
+                  </button>
+                </form>
+                <div
+                  id="categoryList"
+                  class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2"
+                ></div>
+              </div>
+
+              <div
+                class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100"
+              >
+                <h3 class="font-black text-lg mb-6 flex items-center gap-2">
+                  <span class="w-2 h-8 bg-purple-600 rounded-full"></span>
+                  Subjects
+                </h3>
+                <form onsubmit="handleSubjectAdd(event)" class="space-y-4 mb-6">
+                  <div>
+                    <label class="input-label">Category Level</label>
+                    <select id="slevel" class="input-box"></select>
+                  </div>
+                  <div>
+                    <label class="input-label">Subject Name (English)</label>
+                    <input
+                      type="text"
+                      id="sname"
+                      placeholder="e.g. Science"
+                      required
+                      class="input-box"
+                    />
+                  </div>
+                  <div>
+                    <label class="input-label">Local Name (Sinhala)</label>
+                    <input
+                      type="text"
+                      id="ssinhala"
+                      placeholder="e.g. Vidhyawa"
+                      required
+                      class="input-box"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl text-xs uppercase tracking-widest transition-colors shadow-lg shadow-purple-100 active:scale-95"
+                  >
+                    Add Subject
+                  </button>
+                </form>
+                <div
+                  id="subjectList"
+                  class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar pr-2"
+                ></div>
+              </div>
+            </div>
+
+            <!-- Column 2: Years & Types -->
+            <div class="space-y-8">
+              <div
+                class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100"
+              >
+                <h3 class="font-black text-lg mb-6 flex items-center gap-2">
+                  <span class="w-2 h-8 bg-emerald-600 rounded-full"></span> Exam
+                  Years
+                </h3>
+                <form
+                  onsubmit="handleYearAdd(event)"
+                  class="flex items-end gap-2 mb-6"
+                >
+                  <div class="flex-1">
+                    <label class="input-label">New Year</label>
+                    <input
+                      type="text"
+                      id="yearname"
+                      placeholder="YYYY"
+                      required
+                      class="input-box"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    class="px-5 h-[42px] bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-sm uppercase shadow-lg shadow-emerald-100 transition-colors active:scale-95 flex items-center justify-center"
+                  >
+                    +
+                  </button>
+                </form>
+                <div
+                  id="yearList"
+                  class="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto custom-scrollbar pr-2"
+                ></div>
+              </div>
+
+              <div
+                class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100"
+              >
+                <h3 class="font-black text-lg mb-6 flex items-center gap-2">
+                  <span class="w-2 h-8 bg-rose-600 rounded-full"></span> Paper
+                  Types
+                </h3>
+                <form
+                  onsubmit="handleTypeAdd(event)"
+                  class="flex items-end gap-2 mb-6"
+                >
+                  <div class="flex-1">
+                    <label class="input-label">New Type</label>
+                    <input
+                      type="text"
+                      id="typename"
+                      placeholder="e.g. Model Paper"
+                      required
+                      class="input-box"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    class="px-5 h-[42px] bg-rose-600 hover:bg-rose-700 text-white font-black rounded-xl text-sm uppercase shadow-lg shadow-rose-100 transition-colors active:scale-95 flex items-center justify-center"
+                  >
+                    +
+                  </button>
+                </form>
+                <div
+                  id="typeList"
+                  class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2"
+                ></div>
+              </div>
+            </div>
+
+            <!-- Column 3: Parts & Components -->
+            <div class="space-y-8">
+              <div
+                class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100"
+              >
+                <h3 class="font-black text-lg mb-6 flex items-center gap-2">
+                  <span class="w-2 h-8 bg-amber-600 rounded-full"></span> Paper
+                  Parts
+                </h3>
+                <form
+                  onsubmit="handlePartAdd(event)"
+                  class="flex items-end gap-2 mb-6"
+                >
+                  <div class="flex-1">
+                    <label class="input-label">New Segment</label>
+                    <input
+                      type="text"
+                      id="partname"
+                      placeholder="e.g. Part I"
+                      required
+                      class="input-box"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    class="px-5 h-[42px] bg-amber-600 hover:bg-amber-700 text-white font-black rounded-xl text-sm uppercase shadow-lg shadow-amber-100 transition-colors active:scale-95 flex items-center justify-center"
+                  >
+                    +
+                  </button>
+                </form>
+                <div
+                  id="partList"
+                  class="space-y-2 max-h-[500px] overflow-y-auto custom-scrollbar pr-2"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="content-system"
+          class="tab-content hidden animate-fade-in max-w-2xl mx-auto space-y-8"
+        >
+          <div
+            class="bg-white p-10 rounded-[3rem] shadow-xl border border-slate-100"
+          >
+            <h3 class="font-black text-2xl mb-8">System Safety</h3>
+            <div class="space-y-6">
+              <div
+                class="flex items-center justify-between p-6 bg-red-50 rounded-3xl border border-red-100"
+              >
+                <div>
+                  <span class="font-black text-red-900 block"
+                    >Maintenance Mode</span
+                  >
+                  <p
+                    class="text-[10px] text-red-400 font-bold uppercase tracking-widest mt-1"
+                  >
+                    Blocks all public access except admin
+                  </p>
+                </div>
+                <button
+                  id="btn-toggle-maint"
+                  onclick="toggleMaint()"
+                  class="px-6 py-3 bg-red-600 text-white font-black rounded-2xl shadow-lg active:scale-95 transition-all text-xs"
+                >
+                  OFF
+                </button>
+              </div>
+              <div
+                class="flex items-center justify-between p-6 bg-slate-50 rounded-3xl border border-slate-100"
+              >
+                <div>
+                  <span class="font-black text-slate-900 block"
+                    >Backup Configuration</span
+                  >
+                  <p
+                    class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1"
+                  >
+                    Export all settings to JSON file
+                  </p>
+                </div>
+                <button
+                  onclick="exportConfig()"
+                  class="px-6 py-3 bg-slate-900 text-white font-black rounded-2xl shadow-lg active:scale-95 transition-all text-xs flex items-center gap-2"
+                >
+                  EXPORT
+                  <svg
+                    class="w-3 h-3"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: SITE USERS (Super Only) -->
+        <div
+          id="content-users"
+          class="tab-content hidden animate-fade-in max-w-4xl mx-auto space-y-8"
+        >
+          <div
+            class="bg-white p-10 rounded-[3rem] shadow-xl border border-slate-100"
+          >
+            <h3 class="font-black text-2xl mb-8">Registered Library Users</h3>
+            <div id="userList" class="divide-y divide-slate-50"></div>
+          </div>
+        </div>
+
+        <!-- TAB: ADMIN SETTINGS (Super Only) -->
+        <div
+          id="content-admins"
+          class="tab-content hidden animate-fade-in max-w-4xl mx-auto space-y-8"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="md:col-span-1">
+              <form
+                onsubmit="handleAddAdmin(event)"
+                class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 flex flex-col gap-5"
+              >
+                <h3
+                  class="font-black text-lg pb-4 border-b border-slate-50 uppercase tracking-widest text-xs"
+                >
+                  Add New Admin
+                </h3>
+                <div>
+                  <label class="input-label">Gmail Address</label>
+                  <input
+                    type="email"
+                    id="admin-email"
+                    placeholder="admin@domain.com"
+                    required
+                    class="input-box"
+                  />
+                </div>
+                <div>
+                  <label class="input-label">Password</label>
+                  <input
+                    type="password"
+                    id="admin-password"
+                    placeholder="••••••••"
+                    required
+                    class="input-box"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  class="w-full mt-2 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl text-xs uppercase tracking-widest transition-colors shadow-lg active:scale-95"
+                >
+                  Deploy Admin
+                </button>
+              </form>
+            </div>
+            <div class="md:col-span-2">
+              <div
+                class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden"
+              >
+                <h3
+                  class="p-8 font-black text-slate-900 border-b bg-slate-50/30"
+                >
+                  Active Controllers
+                </h3>
+                <div id="adminList" class="divide-y divide-slate-50"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- SCRIPTS CORE -->
+    <script src="data.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        if (sessionStorage.getItem("isAdmin") === "true") showDashboard();
+        else showLogin();
+      });
+
+      function showLogin() {
+        document.getElementById("loginSection").classList.remove("hidden");
+        document.getElementById("dashboardSection").classList.add("hidden");
+      }
+
+      function showDashboard() {
+        document.getElementById("loginSection").classList.add("hidden");
+        document.getElementById("dashboardSection").classList.remove("hidden");
+
+        const role = sessionStorage.getItem("adminRole");
+        if (role === "super") {
+          document
+            .getElementById("super-admin-links")
+            .classList.remove("hidden");
+        } else {
+          document.getElementById("super-admin-links").classList.add("hidden");
+        }
+
+        switchTab("papers");
+        refreshUI();
+      }
+
+      function handleLogin(e) {
+        e.preventDefault();
+        const pass = document.getElementById("password").value;
+        const admins = JSON.parse(localStorage.getItem("siteAdmins")) || [];
+
+        if (pass === "kaveesha") {
+          sessionStorage.setItem("isAdmin", "true");
+          sessionStorage.setItem("adminRole", "super");
+          showDashboard();
+        } else {
+          const admin = admins.find((a) => a.password === pass);
+          if (admin) {
+            sessionStorage.setItem("isAdmin", "true");
+            sessionStorage.setItem("adminRole", "regular");
+            showDashboard();
+          } else {
+            document.getElementById("errorMsg").classList.remove("hidden");
+          }
+        }
+      }
+      function logout() {
+        sessionStorage.clear();
+        location.reload();
+      }
+
+      function switchTab(id) {
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((c) => c.classList.add("hidden"));
+        document.querySelectorAll(".nav-btn").forEach((b) => {
+          b.classList.remove("text-indigo-600", "bg-indigo-50/50", "shadow-sm");
+          b.classList.add("text-slate-400");
+        });
+
+        document.getElementById("content-" + id).classList.remove("hidden");
+        const btn = document.getElementById("nav-" + id);
+        btn.classList.add("text-indigo-600", "bg-indigo-50/50", "shadow-sm");
+        btn.classList.remove("text-slate-400");
+
+        if (id === "design") loadDesignFields();
+        if (id === "pages") renderNavList();
+        if (id === "content") loadContentFields();
+        if (id === "system") updateSystemStatus();
+        if (id === "structure") {
+          renderStructureAll();
+        }
+        if (id === "users") renderUserList();
+        if (id === "admins") renderAdminList();
+      }
+
+      function refreshUI() {
+        renderPapers();
+        populateCategoryDropdowns();
+        populateSubjectDropdown();
+        populateTypeDropdowns();
+        populateYearDropdowns();
+        populatePartDropdowns();
+      }
+
+      function save() {
+        localStorage.setItem("siteConfig", JSON.stringify(siteConfig));
+        updateSiteUI();
+      }
+
+      // --- DASHBOARD LOGIC ---
+      function populateCategoryDropdowns() {
+        const html = siteConfig.categories
+          .map((c) => `<option value="${c.name}">${c.name}</option>`)
+          .join("");
+        document.getElementById("plevel").innerHTML = html;
+        document.getElementById("slevel").innerHTML = html;
+      }
+
+      function populateSubjectDropdown() {
+        const level = document.getElementById("plevel").value;
+        const subs = getSubjects(level);
+        document.getElementById("psubject").innerHTML =
+          subs
+            .map((s) => `<option value="${s.name}">${s.name}</option>`)
+            .join("") || `<option value="General">General</option>`;
+      }
+
+      function populateTypeDropdowns() {
+        document.getElementById("ptype").innerHTML = siteConfig.paperTypes
+          .map((t) => `<option value="${t}">${t}</option>`)
+          .join("");
+      }
+
+      function populateYearDropdowns() {
+        document.getElementById("pyear").innerHTML = siteConfig.years
+          .map((y) => `<option value="${y}">${y}</option>`)
+          .join("");
+      }
+
+      function populatePartDropdowns() {
+        document.getElementById("ppart").innerHTML = siteConfig.parts
+          .map((p) => `<option value="${p}">${p}</option>`)
+          .join("");
+      }
+
+      function handlePaperSubmit(e) {
+        e.preventDefault();
+        const rawUrl = document.getElementById("purl").value;
+        let downloadLink = rawUrl,
+          viewLink = rawUrl;
+        if (rawUrl.includes("drive.google.com")) {
+          const idMatch = rawUrl.match(/\/d\/(.+?)\//);
+          if (idMatch && idMatch[1]) {
+            downloadLink = `https://drive.google.com/uc?export=download&id=${idMatch[1]}`;
+            viewLink = `https://drive.google.com/file/d/${idMatch[1]}/preview`;
+          }
+        }
+        const papers = JSON.parse(localStorage.getItem("examPapers")) || [];
+        const year = document.getElementById("pyear").value;
+        const level = document.getElementById("plevel").value;
+        const subject = document.getElementById("psubject").value;
+        const type = document.getElementById("ptype").value;
+        const part = document.getElementById("ppart").value;
+        const title = document.getElementById("ptitle").value;
+
+        papers.unshift({
+          id: Date.now(),
+          year,
+          subject,
+          level,
+          type,
+          part,
+          title,
+          viewLink,
+          downloadLink,
+          medium: "Sinhala",
+        });
+        localStorage.setItem("examPapers", JSON.stringify(papers));
+        renderPapers();
+        e.target.reset();
+        alert("✅ Content Deployed Live!");
+        refreshUI();
+      }
+
+      function renderPapers() {
+        const query = (
+          document.getElementById("paperSearch")?.value || ""
+        ).toLowerCase();
+        let papers = JSON.parse(localStorage.getItem("examPapers")) || [];
+
+        if (query) {
+          papers = papers.filter(
+            (p) =>
+              p.title.toLowerCase().includes(query) ||
+              p.subject.toLowerCase().includes(query) ||
+              p.year.toString().includes(query),
+          );
+        }
+
+        document.getElementById("paperCount").textContent =
+          papers.length + " Items";
+        document.getElementById("paperList").innerHTML =
+          papers
+            .map(
+              (p) => `
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center p-6 hover:bg-slate-50/50 transition-all gap-4 group">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="bg-indigo-100 text-indigo-700 text-[10px] font-black px-2 py-0.5 rounded uppercase">${p.level}</span>
+                            <span class="bg-slate-100 text-slate-600 text-[10px] font-black px-2 py-0.5 rounded uppercase">${p.year}</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">${p.title}</h4>
+                        <div class="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-widest">${p.subject} • ${p.type} ${p.part ? "• " + p.part : ""}</div>
+                    </div>
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <button onclick="window.open('${p.viewLink}', '_blank')" class="flex-1 md:flex-none px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-[10px] font-black hover:bg-slate-200 transition-all uppercase tracking-widest">Preview</button>
+                        <button onclick="deletePaper(${p.id})" class="flex-1 md:flex-none px-4 py-2 bg-red-50 text-red-500 rounded-xl text-[10px] font-black hover:bg-red-500 hover:text-white transition-all uppercase tracking-widest">Delete</button>
+                    </div>
+                </div>
+            `,
+            )
+            .join("") ||
+          '<div class="p-12 text-center text-slate-400 font-bold">No papers found.</div>';
+      }
+
+      function deletePaper(id) {
+        if (confirm("Permanently delete this entry?")) {
+          let p = JSON.parse(localStorage.getItem("examPapers")) || [];
+          p = p.filter((x) => x.id !== id);
+          localStorage.setItem("examPapers", JSON.stringify(p));
+          renderPapers();
+        }
+      }
+
+      // --- IDENTITY & DESIGN ---
+      function loadDesignFields() {
+        document.getElementById("set-name").value = siteConfig.siteName;
+        document.getElementById("set-logo-text").value =
+          siteConfig.brandLogoText;
+        document.getElementById("set-primary").value = siteConfig.primaryColor;
+        document.getElementById("set-accent").value = siteConfig.accentColor;
+        document.getElementById("set-css").value = siteConfig.customCss;
+      }
+      function handleDesignSave(e) {
+        e.preventDefault();
+        siteConfig.siteName = document.getElementById("set-name").value;
+        siteConfig.brandLogoText =
+          document.getElementById("set-logo-text").value;
+        siteConfig.primaryColor = document.getElementById("set-primary").value;
+        siteConfig.accentColor = document.getElementById("set-accent").value;
+        siteConfig.customCss = document.getElementById("set-css").value;
+        save();
+        alert("🎨 Visual System Re-synchronized!");
+      }
+
+      // --- NAVIGATION ---
+      function renderNavList() {
+        document.getElementById("nav-list").innerHTML = siteConfig.navigation
+          .map(
+            (n, i) => `
+                <div class="flex justify-between items-center p-4 bg-slate-50 border border-slate-100 rounded-2xl group transition-all hover:bg-white">
+                    <span class="font-bold text-sm text-slate-600">${n.label} <span class="text-[10px] text-slate-300 font-mono ml-2">(${n.url})</span></span>
+                    <button onclick="siteConfig.navigation.splice(${i}, 1); save(); renderNavList();" class="text-slate-300 hover:text-red-500 font-black">×</button>
+                </div>
+            `,
+          )
+          .join("");
+      }
+      function handleNavAdd(e) {
+        e.preventDefault();
+        siteConfig.navigation.push({
+          label: document.getElementById("nav-label").value,
+          url: document.getElementById("nav-url").value,
+        });
+        save();
+        renderNavList();
+        e.target.reset();
+      }
+
+      // --- CONTENT ---
+      function loadContentFields() {
+        document.getElementById("set-hero-title").value = siteConfig.heroTitle;
+        document.getElementById("set-hero-sub").value = siteConfig.heroSubtitle;
+        document.getElementById("set-hero-btn").value =
+          siteConfig.heroButtonText;
+        document.getElementById("set-hero-link").value =
+          siteConfig.heroButtonLink;
+      }
+      function handleLandingSave(e) {
+        e.preventDefault();
+        siteConfig.heroTitle = document.getElementById("set-hero-title").value;
+        siteConfig.heroSubtitle = document.getElementById("set-hero-sub").value;
+        siteConfig.heroButtonText =
+          document.getElementById("set-hero-btn").value;
+        siteConfig.heroButtonLink =
+          document.getElementById("set-hero-link").value;
+        save();
+        alert("✨ Landing Experience Updated!");
+      }
+
+      // --- SYSTEM ---
+      function updateSystemStatus() {
+        const btn = document.getElementById("btn-toggle-maint");
+        btn.textContent = siteConfig.maintenanceMode
+          ? "ACTIVE (ON)"
+          : "INACTIVE (OFF)";
+        btn.classList.toggle("bg-slate-900", !siteConfig.maintenanceMode);
+        btn.classList.toggle("bg-red-600", siteConfig.maintenanceMode);
+      }
+      function toggleMaint() {
+        siteConfig.maintenanceMode = !siteConfig.maintenanceMode;
+        save();
+        updateSystemStatus();
+      }
+      function exportConfig() {
+        const dataStr =
+          "data:text/json;charset=utf-8," +
+          encodeURIComponent(JSON.stringify(siteConfig, null, 4));
+        const dlAnchor = document.createElement("a");
+        dlAnchor.setAttribute("href", dataStr);
+        dlAnchor.setAttribute(
+          "download",
+          "site-export-" + Date.now() + ".json",
+        );
+        dlAnchor.click();
+      }
+      // --- STRUCTURE MANAGEMENT ---
+      function renderStructureAll() {
+        renderCategoryManagement();
+        renderSubjectManagement();
+        renderYearManagement();
+        renderTypeManagement();
+        renderPartManagement();
+      }
+
+      function renderCategoryManagement() {
+        document.getElementById("categoryList").innerHTML =
+          siteConfig.categories
+            .map(
+              (c, i) => `
+                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl group hover:bg-white border border-transparent hover:border-slate-100 transition-all">
+                    <div class="flex flex-col">
+                        <span class="font-black text-xs text-indigo-600 uppercase tracking-tighter">${c.id}</span>
+                        <span class="font-bold text-sm text-slate-800">${c.name}</span>
+                    </div>
+                    <button onclick="siteConfig.categories.splice(${i}, 1); save(); renderStructureAll();" class="text-slate-300 hover:text-red-500 font-black">×</button>
+                </div>
+            `,
+            )
+            .join("");
+      }
+
+      function handleCategoryAdd(e) {
+        e.preventDefault();
+        const id = document
+          .getElementById("cat-id")
+          .value.toLowerCase()
+          .replace(/\s+/g, "");
+        const name = document.getElementById("cat-name").value;
+        siteConfig.categories.push({
+          id,
+          name,
+          fullName: name,
+          color: "indigo",
+          icon: "zap",
+        });
+        if (!siteConfig.subjects[id.toUpperCase()])
+          siteConfig.subjects[id.toUpperCase()] = [];
+        save();
+        renderStructureAll();
+        e.target.reset();
+      }
+
+      function renderSubjectManagement() {
+        document.getElementById("subjectList").innerHTML = Object.entries(
+          siteConfig.subjects,
+        )
+          .map(([level, subs]) => {
+            if (!subs || subs.length === 0) return "";
+            return `
+                    <div class="mb-6 last:mb-0">
+                        <div class="px-4 py-2 bg-indigo-50 text-indigo-800 font-black text-xs uppercase tracking-widest rounded-lg inline-block mb-3">${level}</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            ${subs
+                              .map(
+                                (s, i) => `
+                                <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-transparent hover:border-slate-200 group transition-all">
+                                    <div class="flex flex-col">
+                                        <span class="font-black text-sm text-slate-800">${s.name}</span>
+                                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">${s.sinhala}</span>
+                                    </div>
+                                    <button onclick="siteConfig.subjects['${level}'].splice(${i}, 1); save(); renderStructureAll();" class="text-slate-300 hover:text-red-500 font-black">×</button>
+                                </div>
+                            `,
+                              )
+                              .join("")}
+                        </div>
+                    </div>
+                `;
+          })
+          .join("");
+      }
+      function handleSubjectAdd(e) {
+        e.preventDefault();
+        const level = document.getElementById("slevel").value;
+        let key = level === "O/L" ? "OL" : level === "A/L" ? "AL" : level; // mapping for old format
+
+        // Check if it's a new category
+        const isCategory = siteConfig.categories.find((c) => c.name === level);
+        if (isCategory) key = isCategory.id.toUpperCase();
+
+        if (!siteConfig.subjects[key]) siteConfig.subjects[key] = [];
+
+        siteConfig.subjects[key].push({
+          id: document
+            .getElementById("sname")
+            .value.toLowerCase()
+            .replace(/\s+/g, ""),
+          name: document.getElementById("sname").value,
+          sinhala: document.getElementById("ssinhala").value,
+        });
+        save();
+        renderStructureAll();
+        e.target.reset();
+      }
+
+      function renderYearManagement() {
+        document.getElementById("yearList").innerHTML = siteConfig.years
+          .map(
+            (y, i) => `
+                <div class="flex justify-between items-center px-4 py-2 bg-slate-50 rounded-xl border border-transparent hover:border-emerald-100 group transition-all">
+                    <span class="font-black text-xs text-slate-600">${y}</span>
+                    <button onclick="siteConfig.years.splice(${i}, 1); save(); renderStructureAll();" class="text-slate-300 hover:text-red-500">×</button>
+                </div>
+            `,
+          )
+          .join("");
+      }
+      function handleYearAdd(e) {
+        e.preventDefault();
+        siteConfig.years.unshift(document.getElementById("yearname").value);
+        siteConfig.years.sort((a, b) => b - a);
+        save();
+        renderStructureAll();
+        e.target.reset();
+      }
+
+      function renderTypeManagement() {
+        document.getElementById("typeList").innerHTML = siteConfig.paperTypes
+          .map(
+            (t, i) => `
+                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-transparent hover:border-rose-100 group transition-all text-xs font-bold text-slate-700">
+                    ${t}
+                    <button onclick="siteConfig.paperTypes.splice(${i}, 1); save(); renderStructureAll();" class="text-slate-300 hover:text-red-500">×</button>
+                </div>
+            `,
+          )
+          .join("");
+      }
+      function handleTypeAdd(e) {
+        e.preventDefault();
+        siteConfig.paperTypes.push(document.getElementById("typename").value);
+        save();
+        renderStructureAll();
+        e.target.reset();
+      }
+
+      function renderPartManagement() {
+        document.getElementById("partList").innerHTML = siteConfig.parts
+          .map(
+            (p, i) => `
+                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-transparent hover:border-amber-100 group transition-all text-xs font-bold text-slate-700">
+                    ${p}
+                    <button onclick="siteConfig.parts.splice(${i}, 1); save(); renderStructureAll();" class="text-slate-300 hover:text-red-500">×</button>
+                </div>
+            `,
+          )
+          .join("");
+      }
+      function handlePartAdd(e) {
+        e.preventDefault();
+        siteConfig.parts.push(document.getElementById("partname").value);
+        save();
+        renderStructureAll();
+        e.target.reset();
+      }
+
+      // --- USER & ADMIN MGMT ---
+      function renderUserList() {
+        const users = JSON.parse(localStorage.getItem("siteUsers")) || [];
+        document.getElementById("userList").innerHTML =
+          users
+            .map(
+              (u, i) => `
+                <div class="p-6 flex justify-between items-center group ${u.blocked ? "opacity-50 grayscale" : ""}">
+                    <div>
+                        <div class="font-black text-slate-900 flex items-center gap-2">
+                            ${u.name}
+                            ${u.blocked ? '<span class="text-[8px] bg-red-100 text-red-600 px-2 py-0.5 rounded-full">BLOCKED</span>' : ""}
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">${u.email}</div>
+                        <div class="text-[9px] font-bold text-slate-300 mt-1 uppercase tracking-tighter">Joined: ${new Date(u.joined).toLocaleDateString()}</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="toggleBlockUser(${i})" class="text-[10px] font-black ${u.blocked ? "text-emerald-500 bg-emerald-50" : "text-amber-500 bg-amber-50"} px-4 py-2 rounded-xl transition-all uppercase tracking-widest">${u.blocked ? "Unblock" : "Block"}</button>
+                        <button onclick="deleteUser(${i})" class="text-[10px] font-black text-red-300 hover:text-red-500 hover:bg-red-50 px-4 py-2 rounded-xl transition-all uppercase tracking-widest">Delete</button>
+                    </div>
+                </div>
+            `,
+            )
+            .join("") ||
+          '<div class="p-20 text-center text-slate-200 uppercase font-black tracking-[0.2em]">No members yet</div>';
+      }
+
+      function toggleBlockUser(i) {
+        const users = JSON.parse(localStorage.getItem("siteUsers")) || [];
+        users[i].blocked = !users[i].blocked;
+        localStorage.setItem("siteUsers", JSON.stringify(users));
+        renderUserList();
+        alert(
+          `User ${users[i].blocked ? "Blocked" : "Unblocked"} Successfully!`,
+        );
+      }
+
+      function deleteUser(i) {
+        if (confirm("Permanently remove this user and all their data?")) {
+          const users = JSON.parse(localStorage.getItem("siteUsers")) || [];
+          users.splice(i, 1);
+          localStorage.setItem("siteUsers", JSON.stringify(users));
+          renderUserList();
+        }
+      }
+
+      function renderAdminList() {
+        const admins = JSON.parse(localStorage.getItem("siteAdmins")) || [];
+        document.getElementById("adminList").innerHTML =
+          `
+                <div class="p-6 flex justify-between items-center bg-indigo-50/50">
+                    <span class="font-black text-indigo-600 uppercase text-xs">Primary Admin (Kaveesha)</span>
+                    <span class="text-[10px] font-black bg-indigo-600 text-white px-3 py-1 rounded-full uppercase">Super</span>
+                </div>
+            ` +
+          admins
+            .map(
+              (a, i) => `
+                <div class="p-6 flex justify-between items-center group">
+                    <div class="font-bold text-slate-700 text-sm">${a.email}</div>
+                    <button onclick="deleteAdmin(${i})" class="text-[10px] font-black text-red-300 hover:text-red-500 hover:bg-red-50 px-4 py-2 rounded-xl transition-all">REMOVE</button>
+                </div>
+            `,
+            )
+            .join("");
+      }
+
+      function handleAddAdmin(e) {
+        e.preventDefault();
+        const admins = JSON.parse(localStorage.getItem("siteAdmins")) || [];
+        admins.push({
+          email: document.getElementById("admin-email").value,
+          password: document.getElementById("admin-password").value,
+        });
+        localStorage.setItem("siteAdmins", JSON.stringify(admins));
+        renderAdminList();
+        e.target.reset();
+        alert("✅ New Administrator Deployed!");
+      }
+
+      function deleteAdmin(i) {
+        if (confirm("Revoke this admin's access?")) {
+          const admins = JSON.parse(localStorage.getItem("siteAdmins")) || [];
+          admins.splice(i, 1);
+          localStorage.setItem("siteAdmins", JSON.stringify(admins));
+          renderAdminList();
+        }
+      }
+    </script>
+  </body>
+</html>
