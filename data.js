@@ -2,6 +2,31 @@
 // This file manages the entire website structure, design, and content.
 // Changes made in the Admin Panel are saved to LocalStorage and applied instantly.
 
+function escapeHTML(str) {
+    if (typeof str !== 'string') return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function sanitizeURL(url) {
+    if (typeof url !== 'string') return '';
+    try {
+        const parsed = new URL(url, window.location.origin);
+        if (['http:', 'https:'].includes(parsed.protocol)) return url;
+    } catch(e) {}
+    return '';
+}
+
+function sanitizeCSS(css) {
+    if (typeof css !== 'string') return '';
+    // Strip dangerous CSS patterns: url(), expression(), @import, javascript:, behavior, -moz-binding
+    return css
+        .replace(/expression\s*\(/gi, '')
+        .replace(/javascript\s*:/gi, '')
+        .replace(/@import/gi, '')
+        .replace(/behavior\s*:/gi, '')
+        .replace(/-moz-binding/gi, '');
+}
+
 const defaultConfig = {
     // --- 🏢 BASIC IDENTITY ---
     siteName: "ExamPaperLK",
@@ -109,8 +134,17 @@ function updateSiteUI() {
     document.querySelectorAll('[data-site-name]').forEach(el => el.textContent = siteConfig.siteName);
     document.querySelectorAll('[data-logo-text]').forEach(el => {
         if (siteConfig.brandLogoUrl) {
-            el.innerHTML = `<img src="${siteConfig.brandLogoUrl}" class="w-full h-full object-contain p-1">`;
-            el.style.background = 'transparent';
+            const safeUrl = sanitizeURL(siteConfig.brandLogoUrl);
+            if (safeUrl) {
+                const img = document.createElement('img');
+                img.src = safeUrl;
+                img.className = 'w-full h-full object-contain p-1';
+                el.textContent = '';
+                el.appendChild(img);
+                el.style.background = 'transparent';
+            } else {
+                el.textContent = siteConfig.brandLogoText;
+            }
         } else {
             el.textContent = siteConfig.brandLogoText;
         }
@@ -140,7 +174,7 @@ function updateSiteUI() {
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        ${siteConfig.customCss}
+        ${sanitizeCSS(siteConfig.customCss)}
     `;
 
     // Navigation Menu Generator
@@ -156,13 +190,13 @@ function updateSiteUI() {
     navContainers.forEach(container => {
         container.innerHTML = siteConfig.navigation.map(link => {
             if (link.label.toLowerCase() === 'more') {
-                return `<a href="${link.url}" class="group relative px-5 py-2.5 rounded-full text-sm font-black transition-all duration-300 ${window.location.href.includes(link.url) ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/25' : 'bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-600 hover:from-indigo-600 hover:to-purple-600 hover:text-white hover:shadow-lg hover:shadow-indigo-500/25'} flex items-center gap-2">
+                return `<a href="${escapeHTML(link.url)}" class="group relative px-5 py-2.5 rounded-full text-sm font-black transition-all duration-300 ${window.location.href.includes(link.url) ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/25' : 'bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-600 hover:from-indigo-600 hover:to-purple-600 hover:text-white hover:shadow-lg hover:shadow-indigo-500/25'} flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
-                    ${link.label}
+                    ${escapeHTML(link.label)}
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 </a>`;
             }
-            return `<a href="${link.url}" class="px-4 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${window.location.href.includes(link.url) ? 'text-indigo-600 bg-indigo-50' : 'text-gray-500 hover:text-indigo-600 hover:bg-gray-50'}">${link.label}</a>`;
+            return `<a href="${escapeHTML(link.url)}" class="px-4 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${window.location.href.includes(link.url) ? 'text-indigo-600 bg-indigo-50' : 'text-gray-500 hover:text-indigo-600 hover:bg-gray-50'}">${escapeHTML(link.label)}</a>`;
         }).join('') + `
             <button onclick="localStorage.removeItem('currentUser'); location.replace('login.html');" class="ml-3 px-4 py-2 rounded-full text-[10px] font-black text-red-400 hover:text-white hover:bg-red-500 uppercase tracking-widest transition-all duration-300 border border-red-100 hover:border-red-500 hidden md:inline-flex items-center gap-2">
                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
@@ -214,9 +248,9 @@ function updateSiteUI() {
 
                     // Get current user info
                     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-                    const userName = currentUser ? currentUser.name : 'Student';
-                    const userEmail = currentUser ? currentUser.email : '';
-                    const userInitial = userName.charAt(0).toUpperCase();
+                    const userName = escapeHTML(currentUser ? currentUser.name : 'Student');
+                    const userEmail = escapeHTML(currentUser ? currentUser.email : '');
+                    const userInitial = escapeHTML((currentUser ? currentUser.name : 'S').charAt(0).toUpperCase());
 
                     // Navigation Links
                     const navLinks = siteConfig.navigation.map((link, i) => {
@@ -224,9 +258,9 @@ function updateSiteUI() {
                         const isMore = link.label.toLowerCase() === 'more';
                         let icon = '<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>';
                         if (isMore) icon = '<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>';
-                        return `<a href="${link.url}" class="mobile-menu-item flex items-center gap-4 px-5 py-4 rounded-2xl font-bold text-[15px] ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-gray-700 hover:bg-gray-50'} transition-all" style="animation-delay: ${0.1 + i * 0.05}s">
+                        return `<a href="${escapeHTML(link.url)}" class="mobile-menu-item flex items-center gap-4 px-5 py-4 rounded-2xl font-bold text-[15px] ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-gray-700 hover:bg-gray-50'} transition-all" style="animation-delay: ${0.1 + i * 0.05}s">
                             <div class="w-10 h-10 rounded-xl ${isActive ? 'bg-indigo-100' : 'bg-gray-100'} flex items-center justify-center ${isActive ? 'text-indigo-600' : 'text-gray-400'}">${icon}</div>
-                            <span>${link.label}</span>
+                            <span>${escapeHTML(link.label)}</span>
                             ${isMore ? '<span class="ml-auto px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-600 text-[9px] font-black uppercase">New</span>' : ''}
                         </a>`;
                     }).join('');
@@ -234,11 +268,11 @@ function updateSiteUI() {
                     // Category Links
                     const catIcons = { 'OL': '📘', 'AL': '📕', 'book': '📙', 'grad': '🎓' };
                     const categoryLinks = siteConfig.categories.map((cat, i) => `
-                        <a href="paper-view.html?level=${cat.name}" class="mobile-menu-item flex items-center gap-4 px-5 py-3.5 rounded-2xl text-gray-700 hover:bg-gray-50 transition-all" style="animation-delay: ${0.25 + i * 0.05}s">
+                        <a href="paper-view.html?level=${encodeURIComponent(cat.name)}" class="mobile-menu-item flex items-center gap-4 px-5 py-3.5 rounded-2xl text-gray-700 hover:bg-gray-50 transition-all" style="animation-delay: ${0.25 + i * 0.05}s">
                             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-${cat.color}-50 to-${cat.color}-100 flex items-center justify-center text-lg">${catIcons[cat.icon] || '📄'}</div>
                             <div>
-                                <span class="font-bold text-sm block">${cat.name} Papers</span>
-                                <span class="text-[10px] text-gray-400 font-medium">${cat.fullName}</span>
+                                <span class="font-bold text-sm block">${escapeHTML(cat.name)} Papers</span>
+                                <span class="text-[10px] text-gray-400 font-medium">${escapeHTML(cat.fullName)}</span>
                             </div>
                             <svg class="w-4 h-4 text-gray-300 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                         </a>
@@ -317,10 +351,10 @@ function updateSiteUI() {
     const hTitle = document.getElementById('site-hero-title');
     const hSub = document.getElementById('site-hero-subtitle');
     const hBtn = document.getElementById('site-hero-button');
-    if (hTitle) hTitle.innerHTML = `<span class="block text-slate-900 mb-2 drop-shadow-sm tracking-tighter leading-[1.05]">${siteConfig.siteName}</span> <span class="block text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 drop-shadow-md pb-2 tracking-tighter animate-pulse-glow" style="animation-duration: 4s;">${siteConfig.heroTitle}</span>`;
-    if (hSub) hSub.textContent = siteConfig.heroSubtitle;
+    if (hTitle) hTitle.innerHTML = `<span class="block text-slate-900 mb-2 drop-shadow-sm tracking-tighter leading-[1.05]">${escapeHTML(siteConfig.siteName)}</span> <span class="block text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 drop-shadow-md pb-2 tracking-tighter animate-pulse-glow" style="animation-duration: 4s;">${escapeHTML(siteConfig.heroTitle)}</span>`;
+    if (hSub) hSub.textContent = siteConfig.heroSubtitle; // textContent is safe
     if (hBtn) {
-        hBtn.innerHTML = `<span class="relative z-10 flex items-center justify-center gap-3">${siteConfig.heroButtonText} <svg class="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></span><div class="absolute inset-0 h-full w-full bg-gradient-to-r from-purple-600 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>`;
+        hBtn.innerHTML = `<span class="relative z-10 flex items-center justify-center gap-3">${escapeHTML(siteConfig.heroButtonText)} <svg class="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></span><div class="absolute inset-0 h-full w-full bg-gradient-to-r from-purple-600 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>`;
         hBtn.href = siteConfig.heroButtonLink;
     }
 
@@ -336,7 +370,7 @@ function updateSiteUI() {
         bar.className = 'fixed top-0 left-0 w-full z-[100] text-white text-[10px] md:text-xs font-black py-2.5 px-4 text-center block shadow-lg';
         bar.style.background = `linear-gradient(to r, var(--primary), var(--accent))`;
         bar.href = siteConfig.announcementLink;
-        bar.textContent = siteConfig.announcementText;
+        bar.textContent = siteConfig.announcementText; // textContent is safe
         document.querySelectorAll('nav').forEach(n => n.style.marginTop = '40px');
     } else if (bar) {
         bar.remove();
@@ -355,8 +389,8 @@ function updateSiteUI() {
                     <div class="w-16 h-16 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl flex items-center justify-center text-indigo-500 mb-8 border border-white shadow-inner group-hover:scale-110 transition-transform duration-500 group-hover:rotate-3">
                         <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">${icons[f.icon] || icons.zap}</svg>
                     </div>
-                    <h3 class="text-2xl font-black text-slate-800 tracking-tight leading-none mb-4 group-hover:text-indigo-600 transition-colors">${f.title}</h3>
-                    <p class="text-slate-500 font-medium leading-relaxed">${f.desc}</p>
+                    <h3 class="text-2xl font-black text-slate-800 tracking-tight leading-none mb-4 group-hover:text-indigo-600 transition-colors">${escapeHTML(f.title)}</h3>
+                    <p class="text-slate-500 font-medium leading-relaxed">${escapeHTML(f.desc)}</p>
                 </div>
             </div>
         `).join('');
@@ -370,28 +404,28 @@ function updateSiteUI() {
             <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
                 <div class="col-span-1 md:col-span-2">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-black shadow-lg">${siteConfig.brandLogoText}</div>
-                        <span class="font-black text-2xl tracking-tighter text-gray-900">${siteConfig.siteName}</span>
+                        <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-black shadow-lg">${escapeHTML(siteConfig.brandLogoText)}</div>
+                        <span class="font-black text-2xl tracking-tighter text-gray-900">${escapeHTML(siteConfig.siteName)}</span>
                     </div>
-                    <p class="text-gray-500 max-w-sm font-medium leading-relaxed">${siteConfig.seoDescription}</p>
+                    <p class="text-gray-500 max-w-sm font-medium leading-relaxed">${escapeHTML(siteConfig.seoDescription)}</p>
                 </div>
                 <div>
                     <h4 class="font-black text-[10px] text-gray-400 uppercase tracking-[0.2em] mb-6">Explore</h4>
                     <div class="space-y-3">
-                        ${siteConfig.navigation.map(l => `<a href="${l.url}" class="block text-gray-600 hover:text-primary font-bold text-sm">${l.label}</a>`).join('')}
+                        ${siteConfig.navigation.map(l => `<a href="${escapeHTML(l.url)}" class="block text-gray-600 hover:text-primary font-bold text-sm">${escapeHTML(l.label)}</a>`).join('')}
                     </div>
                 </div>
                 <div>
                     <h4 class="font-black text-[10px] text-gray-400 uppercase tracking-[0.2em] mb-6">Official Channels</h4>
                     <div class="flex gap-4">
-                        <a href="https://wa.me/${siteConfig.contactWhatsApp}" class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 hover:bg-[#25D366] hover:text-white transition-all shadow-sm">W</a>
-                        <a href="${siteConfig.socialTelegram}" class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 hover:bg-[#0088cc] hover:text-white transition-all shadow-sm">T</a>
-                        <a href="${siteConfig.socialYoutube}" class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 hover:bg-[#FF0000] hover:text-white transition-all shadow-sm">Y</a>
+                        <a href="https://wa.me/${escapeHTML(siteConfig.contactWhatsApp)}" class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 hover:bg-[#25D366] hover:text-white transition-all shadow-sm">W</a>
+                        <a href="${escapeHTML(siteConfig.socialTelegram)}" class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 hover:bg-[#0088cc] hover:text-white transition-all shadow-sm">T</a>
+                        <a href="${escapeHTML(siteConfig.socialYoutube)}" class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 hover:bg-[#FF0000] hover:text-white transition-all shadow-sm">Y</a>
                     </div>
                 </div>
             </div>
             <div class="max-w-7xl mx-auto mt-16 pt-8 border-t border-gray-50 flex flex-col md:flex-row justify-between items-center text-center gap-4">
-                <span class="text-xs font-black text-gray-300 uppercase tracking-widest">${siteConfig.footerText}</span>
+                <span class="text-xs font-black text-gray-300 uppercase tracking-widest">${escapeHTML(siteConfig.footerText)}</span>
                 <span class="text-[9px] font-black text-white bg-gray-900 px-3 py-1 rounded-full uppercase tracking-widest">No-Code Engine v3.0</span>
             </div>
         `;
