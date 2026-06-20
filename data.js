@@ -81,9 +81,21 @@ const defaultConfig = {
 
 // --- CORE SYSTEM INITIALIZATION ---
 
-const siteConfig = JSON.parse(localStorage.getItem('siteConfig')) || defaultConfig;
-const localPapers = JSON.parse(localStorage.getItem('examPapers')) || [];
-const papersData = [...localPapers];
+function safeJsonParse(key, fallback) {
+    try {
+        var raw = localStorage.getItem(key);
+        if (raw === null) return fallback;
+        var parsed = JSON.parse(raw);
+        return parsed !== null && parsed !== undefined ? parsed : fallback;
+    } catch (e) {
+        console.error('Failed to parse localStorage key "' + key + '":', e);
+        return fallback;
+    }
+}
+
+const siteConfig = safeJsonParse('siteConfig', defaultConfig);
+const localPapers = safeJsonParse('examPapers', []);
+const papersData = Array.isArray(localPapers) ? [...localPapers] : [];
 
 function getSubjects(level) {
     if (!level) return [];
@@ -213,7 +225,7 @@ function updateSiteUI() {
                     mobileMenu.className = 'fixed top-0 right-0 bottom-0 w-[85%] max-w-[380px] bg-white z-[100] mobile-menu-open flex flex-col shadow-[-10px_0_40px_rgba(0,0,0,0.15)]';
 
                     // Get current user info
-                    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                    const currentUser = safeJsonParse('currentUser', null);
                     const userName = currentUser ? currentUser.name : 'Student';
                     const userEmail = currentUser ? currentUser.email : '';
                     const userInitial = userName.charAt(0).toUpperCase();

@@ -1,27 +1,42 @@
 (function () {
-    const publicPages = ['login.html', 'admin/login.html'];
-    // Handle cases where pathname might be empty or "/"
-    const pathParts = window.location.pathname.split('/');
-    const currentPage = pathParts.pop() || 'index.html';
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    var currentUser = null;
+    try {
+        var raw = localStorage.getItem('currentUser');
+        if (raw) currentUser = JSON.parse(raw);
+    } catch (e) {
+        console.error('auth-guard: failed to parse currentUser from localStorage', e);
+        localStorage.removeItem('currentUser');
+    }
 
-    // Check if we are actually on a public page (handling case-sensitivity and local paths)
-    const isPublicPage = publicPages.some(p => currentPage.toLowerCase().includes(p.toLowerCase()));
-    const isAdminPath = window.location.pathname.includes('/admin/');
+    var publicPages = ['login.html', 'admin/login.html'];
+    var pathParts = window.location.pathname.split('/');
+    var currentPage = pathParts.pop() || 'index.html';
+
+    var isPublicPage = publicPages.some(function (p) {
+        return currentPage.toLowerCase().includes(p.toLowerCase());
+    });
+    var isAdminPath = window.location.pathname.includes('/admin/');
 
     if (currentUser) {
-        const users = JSON.parse(localStorage.getItem('siteUsers')) || [];
-        const masterUser = users.find(u => u.email === currentUser.email);
-        if (masterUser && masterUser.blocked) {
-            localStorage.removeItem('currentUser');
-            alert("🚫 Access Restricted: Please contact the administrator.");
-            window.location.href = 'login.html';
-            return;
+        var users = [];
+        try {
+            var rawUsers = localStorage.getItem('siteUsers');
+            if (rawUsers) users = JSON.parse(rawUsers);
+        } catch (e) {
+            console.error('auth-guard: failed to parse siteUsers from localStorage', e);
+        }
+        if (Array.isArray(users)) {
+            var masterUser = users.find(function (u) { return u.email === currentUser.email; });
+            if (masterUser && masterUser.blocked) {
+                localStorage.removeItem('currentUser');
+                alert("Access Restricted: Please contact the administrator.");
+                window.location.href = 'login.html';
+                return;
+            }
         }
     }
 
     if (!currentUser && !isPublicPage && !isAdminPath) {
-        // Redirect to login, ensuring we use a relative path that works on GitHub Pages
         window.location.href = 'login.html';
     }
 })();
