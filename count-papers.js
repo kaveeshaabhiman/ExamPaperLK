@@ -1,14 +1,23 @@
 // This script automatically counts papers from data.js and updates the UI
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Check if papersData is loaded
-    if (typeof papersData === 'undefined') {
-        console.error("data.js is not loaded!");
-        return;
-    }
+function filterPapers(papers, { subject, level, type } = {}) {
+    return papers.filter(paper => {
+        if (level && paper.level !== level) return false;
+        if (type && paper.type !== type) return false;
+        if (subject) {
+            const searchSubject = subject.toLowerCase().trim();
+            const paperSubject = (paper.subject || "").toLowerCase().trim();
+            if (paperSubject !== searchSubject) return false;
+        }
+        return true;
+    });
+}
 
-    // Select all elements that need a count update
-    // Elements should have data-subject, and optionally data-level or data-type
+function countPapers(papers, { subject, level, type } = {}) {
+    return filterPapers(papers, { subject, level, type }).length;
+}
+
+function updatePaperCounts(papersData) {
     const countElements = document.querySelectorAll('[data-count-target]');
 
     countElements.forEach(el => {
@@ -16,25 +25,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const level = el.getAttribute('data-level');
         const type = el.getAttribute('data-type');
 
-        // Filter papers
-        const count = papersData.filter(paper => {
-            // Level check (Mandatory if specified)
-            if (level && paper.level !== level) return false;
-
-            // Type check (Mandatory if specified)
-            if (type && paper.type !== type) return false;
-
-            // Subject check (If specified) - Case-insensitive & trimmed
-            if (subject) {
-                const searchSubject = subject.toLowerCase().trim();
-                const paperSubject = (paper.subject || "").toLowerCase().trim();
-                if (paperSubject !== searchSubject) return false;
-            }
-
-            return true;
-        }).length;
-
-        // Update text
+        const count = countPapers(papersData, { subject, level, type });
         el.textContent = `${count} Papers`;
     });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof papersData === 'undefined') {
+        console.error("data.js is not loaded!");
+        return;
+    }
+    updatePaperCounts(papersData);
 });
+
+// Export for testing (Node.js only)
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { filterPapers, countPapers, updatePaperCounts };
+}

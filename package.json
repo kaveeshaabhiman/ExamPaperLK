@@ -1,0 +1,25 @@
+{
+  "name": "exampaperlk",
+  "version": "1.0.0",
+  "description": "Sri Lanka's Best Past Paper Collection",
+  "main": "data.js",
+  "scripts": {
+    "test": "jest --verbose --coverage"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "testMatch": ["**/tests/**/*.test.js"],
+    "collectCoverageFrom": [
+      "auth-guard.js",
+      "count-papers.js",
+      "data.js"
+    ]
+  }
+}
