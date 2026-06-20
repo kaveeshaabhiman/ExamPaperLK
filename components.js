@@ -1,0 +1,171 @@
+// Shared UI Components & Rendering Utilities
+// Eliminates duplicated HTML/JS patterns across pages.
+
+const Components = {
+
+    /**
+     * Renders the navigation bar HTML.
+     * Used identically across all pages — kept in data.js's updateSiteUI(),
+     * but the static skeleton can be injected by this helper.
+     */
+    navHTML() {
+        return `
+        <nav class="fixed w-full z-[100] transition-all duration-300">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20 glass-card mt-4 rounded-3xl shadow-xl px-8 backdrop-blur-xl bg-white/80 border border-white/50">
+                    <div class="flex-shrink-0 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-primary to-purple-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg" data-logo-text>E</div>
+                        <span class="font-black text-2xl tracking-tighter text-gray-900" data-site-name>ExamPaperLK</span>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="flex items-center space-x-2" data-nav-menu></div>
+                    </div>
+                    <div class="md:hidden">
+                        <button class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-900">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>`;
+    },
+
+    /**
+     * Renders the decorative background blobs used in page headers.
+     */
+    headerBlobs() {
+        return `
+        <div class="blob w-[30rem] h-[30rem] bg-indigo-500 top-[-20%] left-[-10%] opacity-50"></div>
+        <div class="blob w-[25rem] h-[25rem] bg-pink-400 bottom-[-10%] right-[-10%] animate-float-reverse opacity-40"></div>`;
+    },
+
+    /**
+     * Renders a full page header section with badge, title, and description.
+     * @param {object} opts - { badge, title, description }
+     */
+    pageHeader({ badge, title, description }) {
+        return `
+        <header class="relative pt-48 pb-20 px-4 overflow-hidden flex flex-col items-center justify-center">
+            ${Components.headerBlobs()}
+            <div class="max-w-7xl mx-auto text-center relative z-10 animate-slide-up">
+                <span class="inline-block px-6 py-2 rounded-full text-xs font-black uppercase tracking-[0.2em] glass-panel text-gradient mb-6">${badge}</span>
+                <h1 class="text-5xl md:text-7xl font-black text-slate-900 tracking-tighter leading-none mb-6">${title}</h1>
+                <p class="text-slate-500 font-medium max-w-2xl mx-auto text-lg leading-relaxed">${description}</p>
+            </div>
+        </header>`;
+    },
+
+    /**
+     * Renders a subject card for a given subject object and level.
+     * Replaces duplicated template in al.html and ol.html.
+     * @param {object} sub - { name, sinhala, color }
+     * @param {string} level - 'AL' or 'OL'
+     */
+    subjectCard(sub, level) {
+        return `
+        <a href="paper-view.html?subject=${sub.name}&level=${level}" class="group relative bg-white/70 backdrop-blur-xl p-10 rounded-[3rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 hover:-translate-y-3 cursor-pointer border border-white h-72 flex flex-col justify-between overflow-hidden hover-lift">
+            <div class="absolute inset-0 bg-gradient-to-br from-white/40 to-white/0 z-0"></div>
+            <div class="absolute top-[-20%] right-[-20%] w-48 h-48 bg-${sub.color}-500/10 rounded-full blur-3xl group-hover:bg-${sub.color}-500/20 transition-all duration-1000 -mr-8 -mt-8 group-hover:scale-150"></div>
+            <div class="relative z-10">
+                <div class="w-16 h-16 bg-gradient-to-br from-${sub.color}-500 to-${sub.color}-700 rounded-3xl flex items-center justify-center text-white mb-8 shadow-lg shadow-${sub.color}-200/50 group-hover:scale-110 transition-transform duration-500 group-hover:rotate-3">
+                    <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.432.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <h3 class="text-3xl font-black text-slate-800 tracking-tight leading-none mb-3 group-hover:text-${sub.color}-600 transition-colors">${sub.name}</h3>
+                <p class="text-slate-400 font-bold uppercase tracking-[0.2em] text-[11px]">${sub.sinhala}</p>
+            </div>
+            <div class="relative z-10 flex justify-between items-center mt-6">
+                <span data-count-target data-subject="${sub.name}" data-level="${level}" class="text-[11px] font-black text-${sub.color}-600 bg-${sub.color}-50 border border-${sub.color}-100 px-5 py-2 rounded-full uppercase tracking-widest shadow-sm">Loading...</span>
+                <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-gradient-to-br group-hover:from-${sub.color}-500 group-hover:to-${sub.color}-600 group-hover:text-white transition-all duration-300 shadow-md group-hover:shadow-xl group-hover:shadow-${sub.color}-200">
+                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                </div>
+            </div>
+        </a>`;
+    },
+
+    /**
+     * Renders a category card for the "More" page style (tall card).
+     * Replaces duplicated template in more.html.
+     * @param {object} cat - { name, fullName, color, icon }
+     */
+    categoryCard(cat) {
+        return `
+        <a href="paper-view.html?level=${cat.name}" class="group relative bg-white/70 backdrop-blur-xl p-10 rounded-[3rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 hover:-translate-y-3 cursor-pointer border border-white h-80 flex flex-col justify-between overflow-hidden hover-lift">
+            <div class="absolute inset-0 bg-gradient-to-br from-white/40 to-white/0 z-0"></div>
+            <div class="absolute top-[-20%] right-[-20%] w-48 h-48 bg-${cat.color}-500/10 rounded-full blur-3xl group-hover:bg-${cat.color}-500/20 transition-all duration-1000 -mr-8 -mt-8 group-hover:scale-150"></div>
+            <div class="relative z-10">
+                <div class="w-20 h-20 bg-gradient-to-br from-${cat.color}-500 to-${cat.color}-700 rounded-3xl flex items-center justify-center text-white mb-8 shadow-lg shadow-${cat.color}-200/50 group-hover:scale-110 transition-transform duration-500 group-hover:rotate-3">
+                    <span class="font-black text-3xl">${cat.icon}</span>
+                </div>
+                <h3 class="text-4xl font-black text-slate-800 tracking-tight leading-none mb-3 group-hover:text-${cat.color}-600 transition-colors">${cat.name}</h3>
+                <p class="text-slate-400 font-bold uppercase tracking-[0.2em] text-[11px]">${cat.fullName}</p>
+            </div>
+            <div class="relative z-10 flex justify-between items-center mt-6">
+                <span data-count-target data-level="${cat.name === 'O/L' ? 'OL' : cat.name === 'A/L' ? 'AL' : cat.name}" class="text-[11px] font-black text-${cat.color}-600 bg-${cat.color}-50 border border-${cat.color}-100 px-5 py-2 rounded-full uppercase tracking-widest shadow-sm">Loading...</span>
+                <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-gradient-to-br group-hover:from-${cat.color}-500 group-hover:to-${cat.color}-600 group-hover:text-white transition-all duration-300 shadow-md group-hover:shadow-xl group-hover:shadow-${cat.color}-200">
+                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                </div>
+            </div>
+        </a>`;
+    },
+
+    /**
+     * Populates a grid container with subject cards and re-triggers the paper counter.
+     * Replaces the identical DOMContentLoaded logic in al.html and ol.html.
+     * @param {string} gridId - DOM id of the grid container
+     * @param {string} level - 'AL' or 'OL'
+     */
+    renderSubjectGrid(gridId, level) {
+        const grid = document.getElementById(gridId);
+        const subjects = getSubjects(level);
+
+        if (grid) {
+            grid.innerHTML = subjects.map(sub => Components.subjectCard(sub, level)).join('');
+            setTimeout(() => window.dispatchEvent(new Event('DOMContentLoaded')), 100);
+        }
+    },
+
+    /**
+     * Populates a grid container with category cards and re-triggers the paper counter.
+     * Replaces the identical DOMContentLoaded logic in more.html.
+     * @param {string} gridId - DOM id of the grid container
+     */
+    renderCategoryGrid(gridId) {
+        const grid = document.getElementById(gridId);
+        if (grid) {
+            grid.innerHTML = siteConfig.categories.map(cat => Components.categoryCard(cat)).join('');
+            setTimeout(() => window.dispatchEvent(new Event('DOMContentLoaded')), 100);
+        }
+    },
+
+    /**
+     * Injects the navigation bar into the page at the specified container or as first child of body.
+     * Call this immediately (not inside DOMContentLoaded) so that data.js's updateSiteUI()
+     * can find [data-nav-menu] and [data-logo-text] when it fires.
+     * @param {string} [containerId] - Optional container ID. If omitted, prepends to body.
+     */
+    injectNav(containerId) {
+        const html = Components.navHTML();
+        if (containerId) {
+            const container = document.getElementById(containerId);
+            if (container) container.innerHTML = html;
+        } else {
+            const existing = document.querySelector('nav.fixed');
+            if (!existing) {
+                document.body.insertAdjacentHTML('afterbegin', html);
+            }
+        }
+    }
+};
+
+// Auto-inject navigation if a #nav-container element exists.
+// Runs immediately at script load time (before DOMContentLoaded handlers in data.js).
+(function () {
+    const navContainer = document.getElementById('nav-container');
+    if (navContainer) {
+        Components.injectNav('nav-container');
+    }
+})();
