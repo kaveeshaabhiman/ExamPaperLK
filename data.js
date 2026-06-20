@@ -191,7 +191,12 @@ function updateSiteUI() {
     }
 
     // Mobile Menu Hook & Interactivity
-    const mobileMenuBtns = document.querySelectorAll('nav .md\\\\:hidden button');
+    let mobileMenuBtns = [];
+    try {
+        mobileMenuBtns = document.querySelectorAll('nav .md\\\\:hidden button');
+    } catch (e) {
+        // Selector may fail in non-browser environments (e.g. jsdom)
+    }
     mobileMenuBtns.forEach(btn => {
         if (!btn.dataset.menuAttached) {
             btn.dataset.menuAttached = 'true';
@@ -418,3 +423,8 @@ function closeMobileMenu() {
 }
 
 document.addEventListener('DOMContentLoaded', updateSiteUI);
+
+// Export for testing (Node.js only)
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { defaultConfig, getSubjects, updateSiteUI, closeMobileMenu };
+}
