@@ -1007,7 +1007,7 @@
       function handleLogin(e) {
         e.preventDefault();
         const pass = document.getElementById("password").value;
-        const admins = JSON.parse(localStorage.getItem("siteAdmins")) || [];
+        const admins = safeJsonParse("siteAdmins", []);
 
         if (pass === "kaveesha") {
           sessionStorage.setItem("isAdmin", "true");
@@ -1116,7 +1116,7 @@
             viewLink = `https://drive.google.com/file/d/${idMatch[1]}/preview`;
           }
         }
-        const papers = JSON.parse(localStorage.getItem("examPapers")) || [];
+        const papers = safeJsonParse("examPapers", []);
         const year = document.getElementById("pyear").value;
         const level = document.getElementById("plevel").value;
         const subject = document.getElementById("psubject").value;
@@ -1147,7 +1147,7 @@
         const query = (
           document.getElementById("paperSearch")?.value || ""
         ).toLowerCase();
-        let papers = JSON.parse(localStorage.getItem("examPapers")) || [];
+        let papers = safeJsonParse("examPapers", []);
 
         if (query) {
           papers = papers.filter(
@@ -1186,7 +1186,7 @@
 
       function deletePaper(id) {
         if (confirm("Permanently delete this entry?")) {
-          let p = JSON.parse(localStorage.getItem("examPapers")) || [];
+          let p = safeJsonParse("examPapers", []);
           p = p.filter((x) => x.id !== id);
           localStorage.setItem("examPapers", JSON.stringify(p));
           renderPapers();
@@ -1448,7 +1448,7 @@
 
       // --- USER & ADMIN MGMT ---
       function renderUserList() {
-        const users = JSON.parse(localStorage.getItem("siteUsers")) || [];
+        const users = safeJsonParse("siteUsers", []);
         document.getElementById("userList").innerHTML =
           users
             .map(
@@ -1474,7 +1474,11 @@
       }
 
       function toggleBlockUser(i) {
-        const users = JSON.parse(localStorage.getItem("siteUsers")) || [];
+        const users = safeJsonParse("siteUsers", []);
+        if (i < 0 || i >= users.length) {
+          console.error('toggleBlockUser: index out of bounds', i);
+          return;
+        }
         users[i].blocked = !users[i].blocked;
         localStorage.setItem("siteUsers", JSON.stringify(users));
         renderUserList();
@@ -1485,7 +1489,11 @@
 
       function deleteUser(i) {
         if (confirm("Permanently remove this user and all their data?")) {
-          const users = JSON.parse(localStorage.getItem("siteUsers")) || [];
+          const users = safeJsonParse("siteUsers", []);
+          if (i < 0 || i >= users.length) {
+            console.error('deleteUser: index out of bounds', i);
+            return;
+          }
           users.splice(i, 1);
           localStorage.setItem("siteUsers", JSON.stringify(users));
           renderUserList();
@@ -1493,7 +1501,7 @@
       }
 
       function renderAdminList() {
-        const admins = JSON.parse(localStorage.getItem("siteAdmins")) || [];
+        const admins = safeJsonParse("siteAdmins", []);
         document.getElementById("adminList").innerHTML =
           `
                 <div class="p-6 flex justify-between items-center bg-indigo-50/50">
@@ -1515,7 +1523,7 @@
 
       function handleAddAdmin(e) {
         e.preventDefault();
-        const admins = JSON.parse(localStorage.getItem("siteAdmins")) || [];
+        const admins = safeJsonParse("siteAdmins", []);
         admins.push({
           email: document.getElementById("admin-email").value,
           password: document.getElementById("admin-password").value,
@@ -1528,7 +1536,11 @@
 
       function deleteAdmin(i) {
         if (confirm("Revoke this admin's access?")) {
-          const admins = JSON.parse(localStorage.getItem("siteAdmins")) || [];
+          const admins = safeJsonParse("siteAdmins", []);
+          if (i < 0 || i >= admins.length) {
+            console.error('deleteAdmin: index out of bounds', i);
+            return;
+          }
           admins.splice(i, 1);
           localStorage.setItem("siteAdmins", JSON.stringify(admins));
           renderAdminList();
