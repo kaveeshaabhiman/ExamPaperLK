@@ -1,27 +1,30 @@
 (function () {
-    const publicPages = ['login.html', 'admin/login.html'];
-    // Handle cases where pathname might be empty or "/"
-    const pathParts = window.location.pathname.split('/');
-    const currentPage = pathParts.pop() || 'index.html';
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const publicPages = ['login.html', 'admin.html'];
+    var pathParts = window.location.pathname.split('/');
+    var currentPage = pathParts.pop() || 'index.html';
 
-    // Check if we are actually on a public page (handling case-sensitivity and local paths)
-    const isPublicPage = publicPages.some(p => currentPage.toLowerCase().includes(p.toLowerCase()));
-    const isAdminPath = window.location.pathname.includes('/admin/');
+    var isPublicPage = publicPages.some(function(p) {
+        return currentPage.toLowerCase().includes(p.toLowerCase());
+    });
 
-    if (currentUser) {
-        const users = JSON.parse(localStorage.getItem('siteUsers')) || [];
-        const masterUser = users.find(u => u.email === currentUser.email);
+    if (isPublicPage) return;
+
+    var raw = localStorage.getItem('currentUser');
+    var currentUser = null;
+    try { currentUser = JSON.parse(raw); } catch(e) { currentUser = null; }
+
+    if (currentUser && typeof currentUser === 'object') {
+        var users = [];
+        try { users = JSON.parse(localStorage.getItem('siteUsers')) || []; } catch(e) {}
+        var masterUser = users.find(function(u) { return u.email === currentUser.email; });
         if (masterUser && masterUser.blocked) {
             localStorage.removeItem('currentUser');
-            alert("🚫 Access Restricted: Please contact the administrator.");
             window.location.href = 'login.html';
             return;
         }
     }
 
-    if (!currentUser && !isPublicPage && !isAdminPath) {
-        // Redirect to login, ensuring we use a relative path that works on GitHub Pages
+    if (!currentUser) {
         window.location.href = 'login.html';
     }
 })();
